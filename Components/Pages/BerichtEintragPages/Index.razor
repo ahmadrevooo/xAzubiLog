@@ -1,0 +1,52 @@
+﻿@page "/berichteintrags"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using xAzubiLog.Models
+@using xAzubiLog.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="berichteintrags/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.BerichtEintrag">
+    <PropertyColumn Property="berichteintrag => berichteintrag.BenutzerId" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.AusbilderId" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.KategorieId" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.WochenberichtId" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Datum" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Tagestyp" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Auftragsnummer" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Titel" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Beschreibung" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Notiz" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Fach" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Startzeit" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Endzeit" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Dauer" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.Status" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.ErstelltAm" />
+    <PropertyColumn Property="berichteintrag => berichteintrag.GeändertAm" />
+
+    <TemplateColumn Context="berichteintrag">
+        <a href="@($"berichteintrags/edit?id={berichteintrag.Id}")">Edit</a> |
+        <a href="@($"berichteintrags/details?id={berichteintrag.Id}")">Details</a> |
+        <a href="@($"berichteintrags/delete?id={berichteintrag.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private xAzubiLogContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

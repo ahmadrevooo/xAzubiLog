@@ -1,0 +1,78 @@
+﻿@page "/berichteintrags/details"
+@using Microsoft.EntityFrameworkCore
+@using xAzubiLog.Models
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>BerichtEintrag</h2>
+    <hr />
+    @if (berichteintrag is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">BenutzerId</dt>
+            <dd class="col-sm-10">@berichteintrag.BenutzerId</dd>
+            <dt class="col-sm-2">AusbilderId</dt>
+            <dd class="col-sm-10">@berichteintrag.AusbilderId</dd>
+            <dt class="col-sm-2">KategorieId</dt>
+            <dd class="col-sm-10">@berichteintrag.KategorieId</dd>
+            <dt class="col-sm-2">WochenberichtId</dt>
+            <dd class="col-sm-10">@berichteintrag.WochenberichtId</dd>
+            <dt class="col-sm-2">Datum</dt>
+            <dd class="col-sm-10">@berichteintrag.Datum</dd>
+            <dt class="col-sm-2">Tagestyp</dt>
+            <dd class="col-sm-10">@berichteintrag.Tagestyp</dd>
+            <dt class="col-sm-2">Auftragsnummer</dt>
+            <dd class="col-sm-10">@berichteintrag.Auftragsnummer</dd>
+            <dt class="col-sm-2">Titel</dt>
+            <dd class="col-sm-10">@berichteintrag.Titel</dd>
+            <dt class="col-sm-2">Beschreibung</dt>
+            <dd class="col-sm-10">@berichteintrag.Beschreibung</dd>
+            <dt class="col-sm-2">Notiz</dt>
+            <dd class="col-sm-10">@berichteintrag.Notiz</dd>
+            <dt class="col-sm-2">Fach</dt>
+            <dd class="col-sm-10">@berichteintrag.Fach</dd>
+            <dt class="col-sm-2">Startzeit</dt>
+            <dd class="col-sm-10">@berichteintrag.Startzeit</dd>
+            <dt class="col-sm-2">Endzeit</dt>
+            <dd class="col-sm-10">@berichteintrag.Endzeit</dd>
+            <dt class="col-sm-2">Dauer</dt>
+            <dd class="col-sm-10">@berichteintrag.Dauer</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@berichteintrag.Status</dd>
+            <dt class="col-sm-2">ErstelltAm</dt>
+            <dd class="col-sm-10">@berichteintrag.ErstelltAm</dd>
+            <dt class="col-sm-2">GeändertAm</dt>
+            <dd class="col-sm-10">@berichteintrag.GeändertAm</dd>
+        </dl>
+        <div>
+            <a href="@($"/berichteintrags/edit?id={berichteintrag.Id}")">Edit</a> |
+            <a href="@($"/berichteintrags")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private BerichtEintrag? berichteintrag;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        berichteintrag = await context.BerichtEintrag.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (berichteintrag is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}
