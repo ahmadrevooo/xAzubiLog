@@ -1,30 +1,158 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">xAzubiLog</a>
+﻿<nav class="py-4 px-4 px-md-5" style="background-color: transparent;">
+    <div class="d-flex justify-content-between align-items-center w-100">
+
+        <a class="d-flex align-items-center text-white text-decoration-none" href="" style="padding: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="me-3" style="display: block;">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                <line x1="10" y1="6" x2="16" y2="6" />
+                <line x1="10" y1="10" x2="16" y2="10" />
+            </svg>
+            <span class="fw-medium" style="font-size: 1.2rem; letter-spacing: 0.5px; line-height: 1;">AzubiLog</span>
+        </a>
+
+        <div class="d-none d-lg-flex align-items-center justify-content-center">
+            <div style="display: flex; align-items: center; gap: 3rem; margin: 0; padding: 0;">
+
+                <div class="sqs-nav-item">
+                    <a href="entries" class="sqs-nav-link">
+                        <span style="line-height: 1;">Einträge</span>
+                        <span class="sqs-chevron-wrapper">
+                            <svg class="sqs-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </a>
+                    <div class="sqs-dropdown-menu">
+                        <div class="p-4">
+                            <span class="d-block mb-3 text-uppercase" style="color: #666; font-size: 0.75rem; letter-spacing: 1px;">Übersicht</span>
+                            <a href="entries" class="sqs-dropdown-link">Alle Einträge</a>
+                            <a href="#" class="sqs-dropdown-link">Fehlende Einträge</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sqs-nav-item">
+                    <a href="weekly" class="sqs-nav-link">
+                        <span style="line-height: 1;">Wochenbericht</span>
+                        <span class="sqs-chevron-wrapper">
+                            <svg class="sqs-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
+                    </a>
+                    <div class="sqs-dropdown-menu">
+                        <div class="p-4">
+                            <span class="d-block mb-3 text-uppercase" style="color: #666; font-size: 0.75rem; letter-spacing: 1px;">Aktionen</span>
+                            <a href="weekly" class="sqs-dropdown-link">Zur Übersicht</a>
+                            <a href="#" class="sqs-dropdown-link">Als PDF exportieren</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sqs-nav-item">
+                    <a href="create" class="sqs-nav-link">
+                        <span style="line-height: 1;">Eintrag erstellen</span>
+                        <span class="sqs-chevron-wrapper">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-none d-lg-flex align-items-center">
+            <a href="login" class="text-white text-decoration-none fw-medium" style="letter-spacing: 0.5px; opacity: 0.85; transition: opacity 0.2s;">Anmelden</a>
+        </div>
+
     </div>
-</div>
+</nav>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<style>
+    /* 1. Die unsichtbare Hitbox vergrößern, damit das Hovern nicht abreißt */
+    .sqs-nav-item {
+        position: relative;
+        padding: 20px 0;
+        margin: -20px 0;
+    }
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+    /* 2. Styling der Links */
+    .sqs-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #ffffff;
+        text-decoration: none;
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+        cursor: pointer;
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
+    .sqs-nav-item:hover .sqs-nav-link {
+        opacity: 1;
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    /* 3. Pfeil Rotation (Der Schlüssel zum Squarespace-Look) */
+    .sqs-chevron-wrapper {
+        display: flex;
+        align-items: center;
+        transform: translateY(1px); /* Hält die Linie kerzengerade */
+    }
 
+    .sqs-chevron {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Butterweiche Animation */
+    }
+
+    .sqs-nav-item:hover .sqs-chevron {
+        transform: rotate(180deg); /* Pfeil dreht sich nach oben */
+    }
+
+    /* 4. Das fließende Premium Dropdown */
+    .sqs-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px); /* Leicht nach unten versetzt für den Drop-Effekt */
+        background-color: #0a0a0a; /* Tiefschwarz wie in deinem Screenshot */
+        border: 1px solid #1f1f1f;
+        border-radius: 8px; /* Moderne, leichte Abrundung */
+        min-width: 240px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none; /* Blockiert Klicks, solange es unsichtbar ist */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+
+        /* Baut eine unsichtbare Brücke zwischen Link und Menü */
+        .sqs-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+        }
+
+    /* Fade-In Effekt */
+    .sqs-nav-item:hover .sqs-dropdown-menu {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0); /* Fährt sanft an seinen Platz */
+        pointer-events: auto;
+    }
+
+    /* 5. Die Links im Dropdown */
+    .sqs-dropdown-link {
+        display: block;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 8px 0;
+        opacity: 0.6;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+        /* Subtiler Einrück-Effekt beim Hovern auf die Unterpunkte */
+        .sqs-dropdown-link:hover {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+</style>
