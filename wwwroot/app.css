@@ -1,29 +1,49 @@
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+/* 1. Premium-Schriftart 'Inter' direkt von Google laden */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* 2. Globales Fundament (Deine warmen dunklen Farben + neue Schrift) */
+body, html, .page, main, .content {
+    background-color: #211e1d !important;
+    color: #ffffff !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
+
+.page, main, .content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* 3. Saubere Navigation & Links (Kein Standard-Blau mehr!) */
+.nav-link {
+    color: #ffffff !important;
+    opacity: 0.9;
+    transition: opacity 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    .nav-link:hover {
+        opacity: 1;
+    }
 
 a, .btn-link {
-    color: #006bb7;
+    color: #ffffff;
+    text-decoration: none;
 }
 
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
+    a:hover, .btn-link:hover {
+        color: #a3a3a3;
+    }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-.content {
-    padding-top: 1.1rem;
+/* 4. Fokus-Ränder dezent anpassen (Kein greller blauer Rahmen beim Klicken) */
+.btn:focus, .btn:active:focus, .nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1) !important;
 }
 
 h1:focus {
     outline: none;
 }
 
+/* 5. Blazor Standard-Klassen (Fehlermeldungen & Validierung - bleibt unangetastet für die Funktion) */
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }
