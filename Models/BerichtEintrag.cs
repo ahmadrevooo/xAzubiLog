@@ -1,6 +1,6 @@
 ﻿namespace xAzubiLog.Models
 {
-    public class BerichtEintrag
+    public class BerichtEintraege
     {
         public int Id { get; set; }
         public int BenutzerId { get; set; }

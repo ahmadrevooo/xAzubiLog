@@ -10,15 +10,15 @@ using xAzubiLog.Data;
 
 namespace xAzubiLog.Migrations
 {
-    [DbContext(typeof(xAzubiLogContext))]
-    [Migration("20260430095701_InitialCreate")]
+    [DbContext(typeof(AzubiLog_BlazorContext))]
+    [Migration("20260507071321_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
 
             modelBuilder.Entity("xAzubiLog.Models.Ausbilder", b =>
                 {
@@ -43,7 +43,7 @@ namespace xAzubiLog.Migrations
                     b.ToTable("Ausbilder");
                 });
 
-            modelBuilder.Entity("xAzubiLog.Models.BerichtEintrag", b =>
+            modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,7 +115,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("WochenberichtId");
 
-                    b.ToTable("BerichtEintrag");
+                    b.ToTable("BerichtEintraege");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Kategorie", b =>
@@ -142,7 +142,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Kategorie");
+                    b.ToTable("Kategorien");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.User", b =>
@@ -184,7 +184,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Wochenbericht", b =>
@@ -220,10 +220,10 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Wochenbericht");
+                    b.ToTable("Wochenberichte");
                 });
 
-            modelBuilder.Entity("xAzubiLog.Models.BerichtEintrag", b =>
+            modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
                 {
                     b.HasOne("xAzubiLog.Models.Ausbilder", "Ausbilder")
                         .WithMany("BerichtEintraege")

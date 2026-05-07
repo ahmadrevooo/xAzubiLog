@@ -1,0 +1,106 @@
+﻿@page "/passwort-reset"
+@using xAzubiLog.Data
+@using Microsoft.EntityFrameworkCore
+@inject AzubiLog_BlazorContext DB
+
+<h3>Passwort zurücksetzen</h3>
+
+@if (!string.IsNullOrEmpty(fehler))
+{
+    <p style="color:red">@fehler</p>
+}
+
+@if (erfolg)
+{
+    <p style="color:green">
+        Passwort erfolgreich geändert.
+        <a href="/login">Zum Login</a>
+    </p>
+}
+else if (tokenGueltig)
+{
+    <EditForm OnValidSubmit="PasswortZuruecksetzen">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Neues Passwort</label><br />
+            <InputText type="password" @bind-Value="neuesPasswort" />
+        </div>
+
+        <div>
+            <label>Passwort bestätigen</label><br />
+            <InputText type="password" @bind-Value="passwortBestaetigen" />
+        </div>
+
+        <button type="submit">Passwort ändern</button>
+    </EditForm>
+}
+else
+{
+    <p>Ungültiger oder abgelaufener Token.</p>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Token { get; set; }
+
+    private string neuesPasswort = "";
+    private string passwortBestaetigen = "";
+
+    private bool tokenGueltig = false;
+    private bool erfolg = false;
+    private string fehler = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Token))
+        {
+            fehler = "Kein Token vorhanden.";
+            return;
+        }
+
+        var tokenEntity = await DB.PasswortResetTokens
+            .FirstOrDefaultAsync(t => t.Token == Token && t.Ablauf > DateTime.UtcNow);
+
+        if (tokenEntity == null)
+        {
+            fehler = "Token ungültig oder abgelaufen.";
+            return;
+        }
+
+        tokenGueltig = true;
+    }
+
+    private async Task PasswortZuruecksetzen()
+    {
+        if (neuesPasswort != passwortBestaetigen)
+        {
+            fehler = "Passwörter stimmen nicht überein.";
+            return;
+        }
+
+        var tokenEntity = await DB.PasswortResetTokens
+            .FirstOrDefaultAsync(t => t.Token == Token && t.Ablauf > DateTime.UtcNow);
+
+        if (tokenEntity == null)
+        {
+            fehler = "Token ungültig oder abgelaufen.";
+            return;
+        }
+
+        var user = await DB.Users.FindAsync(tokenEntity.UserId);
+        if (user == null)
+        {
+            fehler = "Benutzer nicht gefunden.";
+            return;
+        }
+
+        user.PasswortHash = BCrypt.Net.BCrypt.HashPassword(neuesPasswort);
+
+        DB.PasswortResetTokens.Remove(tokenEntity);
+        await DB.SaveChangesAsync();
+
+        erfolg = true;
+    }
+}
