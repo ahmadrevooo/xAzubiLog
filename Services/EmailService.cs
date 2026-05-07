@@ -1,31 +1,60 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using Microsoft.Extensions.Configuration;
 
 namespace xAzubiLog.Services
 {
     public class EmailService
     {
+        private readonly IConfiguration _config;
+
+        public EmailService(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public async Task SendePasswortResetMail(string empfaenger, string resetLink)
         {
-            var message = new MimeMessage();
-            message.From.Add(MailboxAddress.Parse("noreply@azubilog.de"));
-            message.To.Add(MailboxAddress.Parse(empfaenger));
-            message.Subject = "Passwort zurücksetzen";
-
-            message.Body = new TextPart("plain")
+            Console.WriteLine("🔥 EMAIL SERVICE WIRD AUFGERUFEN");
+            try
             {
-                Text = $"Setze dein Passwort hier zurück:\n\n{resetLink}"
-            };
+                Console.WriteLine("SMTP START");
 
-            using var client = new SmtpClient();
-            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                var message = new MimeMessage();
+                message.From.Add(MailboxAddress.Parse("noreply@azubilog.de"));
+                message.To.Add(MailboxAddress.Parse(empfaenger));
+                message.Subject = "Passwort Reset";
 
-            // HIER DEINE DATEN EINTRAGEN
-            await client.AuthenticateAsync("tamarazxbel@gmail.com", "mhot fepx ljpo gagb");
+                Console.WriteLine("Mail gebaut");
 
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+                using var client = new MailKit.Net.Smtp.SmtpClient();
+
+                Console.WriteLine("Verbinde SMTP...");
+
+                await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+
+                Console.WriteLine("Verbunden");
+
+                await client.AuthenticateAsync("tamarazxbel@gmail.com", "sikp lnna eqdc nods");
+
+                Console.WriteLine("Authentifiziert");
+
+                await client.SendAsync(message);
+
+                Console.WriteLine("Gesendet");
+
+                await client.DisconnectAsync(true);
+
+                Console.WriteLine("SMTP DONE");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("SMTP ERROR:");
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
         }
+
     }
 }

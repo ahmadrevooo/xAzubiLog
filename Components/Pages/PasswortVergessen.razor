@@ -1,4 +1,5 @@
 ﻿@page "/passwort-vergessen"
+@rendermode InteractiveServer
 
 @using xAzubiLog.Data
 @using xAzubiLog.Models
@@ -6,8 +7,8 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject AzubiLog_BlazorContext DB
-@inject EmailService EmailService
 @inject NavigationManager Nav
+@inject EmailService _emailService
 
 <PageTitle>Passwort vergessen – xAzubiLog</PageTitle>
 
@@ -15,34 +16,30 @@
     <div class="card">
         <div class="card2">
 
-           <EditForm Model="this"
-          FormName="PasswortVergessenForm"
-          class="form"
-          OnValidSubmit="PasswortVergessenAbsenden">
-                <DataAnnotationsValidator />
-
+            <div class="form">
                 <p id="heading">xAzubiLog</p>
 
                 @if (!string.IsNullOrEmpty(fehler))
                 {
-                    <div style="color:#ff6b6b; text-align:center; font-size:0.85rem;">
+                    <div class="error-box">
                         @fehler
                     </div>
                 }
 
                 @if (erfolg)
                 {
-                    <div style="color:#00ff75; text-align:center; font-size:0.85rem;">
+                    <div class="success-box">
                         E-Mail wurde gesendet! Prüfe dein Postfach.
                     </div>
                 }
 
                 <div class="field">
-                    <input class="input-field"
-                           type="email"
-                           placeholder="E-Mail"
-                           autocomplete="off"
-                           @bind="email" />
+                    <InputText class="input-field"
+           type="email"
+           placeholder="E-Mail"
+           autocomplete="off"
+           @bind-Value="email" />
+
                 </div>
 
                 <div class="btn">
@@ -53,11 +50,13 @@
                     </button>
 
                     <button class="button1"
-                            type="submit">
-                        Senden
+                            type="button"
+                            @onclick="PasswortVergessenAbsenden"
+                            disabled="@laden">
+                        @(laden ? "Sende..." : "Senden")
                     </button>
                 </div>
-            </EditForm>
+            </div>
 
         </div>
     </div>
@@ -75,44 +74,34 @@
     .card {
         background-image: linear-gradient(163deg, #00ff75 0%, #3700ff 100%);
         border-radius: 22px;
-        transition: all 0.3s;
+        padding: 2px;
     }
 
     .card2 {
-        border-radius: 0;
-        transition: all 0.2s;
-    }
-
-    .card2:hover {
-        transform: scale(0.98);
         border-radius: 20px;
-    }
-
-    .card:hover {
-        box-shadow: 0px 0px 30px 1px rgba(0, 255, 117, 0.3);
+        background: #171717;
     }
 
     .form {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
         padding: 2em;
-        background-color: #171717;
-        border-radius: 25px;
+        min-width: 320px;
     }
 
     #heading {
         text-align: center;
         color: white;
-        font-size: 1.2em;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
     }
 
     .field {
         display: flex;
         align-items: center;
-        gap: 0.5em;
         border-radius: 25px;
-        padding: 0.6em;
+        padding: 0.8em;
         background-color: #171717;
         box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
     }
@@ -122,82 +111,139 @@
         border: none;
         outline: none;
         width: 100%;
-        color: #d3d3d3;
+        color: white;
+        font-size: 1rem;
     }
 
     .btn {
         display: flex;
         justify-content: center;
-        gap: 0.5em;
-        margin-top: 1.5em;
+        gap: 10px;
+        margin-top: 10px;
     }
 
-    .button1, .button2 {
-        padding: 0.5em 1.2em;
-        border-radius: 5px;
+    .button1,
+    .button2 {
+        padding: 0.7em 1.4em;
+        border-radius: 8px;
         border: none;
         background-color: #252525;
         color: white;
         cursor: pointer;
+        transition: 0.2s;
     }
 
-    .button1:hover, .button2:hover {
-        background-color: black;
+    .button1:hover,
+    .button2:hover {
+        background-color: #333;
+    }
+
+    .button1:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .error-box {
+        color: #ff6b6b;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .success-box {
+        color: #00ff75;
+        text-align: center;
+        font-size: 0.9rem;
     }
 </style>
 
 @code {
+
     private string email = "";
     private string fehler = "";
     private bool erfolg = false;
+    private bool laden = false;
 
     private async Task PasswortVergessenAbsenden()
     {
-        Console.WriteLine("PASSWORT VERGESSEN BUTTON GEKLICKT");
-
-        fehler = "";
-        erfolg = false;
-
-        if (string.IsNullOrWhiteSpace(email))
+        try
         {
-            fehler = "Bitte eine E-Mail-Adresse eingeben.";
-            return;
-        }
+            laden = true;
 
-        var user = await DB.Users
-            .FirstOrDefaultAsync(u => u.Email == email);
+            Console.WriteLine($"EMAIL IST: '{email}'");
 
-        // Security: kein Hinweis, ob User existiert
-        if (user == null)
-        {
+            fehler = "";
+            erfolg = false;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                fehler = "Bitte eine E-Mail-Adresse eingeben.";
+                return;
+            }
+
+            var user = await DB.Users
+    .FirstOrDefaultAsync(u =>
+        u.Email.ToLower().Trim() == email.ToLower().Trim());
+
+Console.WriteLine($"USER COUNT: {await DB.Users.CountAsync()}");
+
+var allUsers = await DB.Users.ToListAsync();
+foreach (var u in allUsers)
+{
+    Console.WriteLine($"DB EMAIL: '{u.Email}'");
+}
+
+Console.WriteLine($"USER FOUND: {user != null}");
+Console.WriteLine($"EMAIL LENGTH: {email.Length}");
+Console.WriteLine($"EMAIL BYTES: {string.Join(",", email.Select(c => (int)c))}");
+
+            if (user == null)
+            {
+                erfolg = true;
+                return;
+            }
+
+            var alterToken = await DB.PasswortResetTokens
+                .FirstOrDefaultAsync(t =>
+                    t.UserId == user.ID &&
+                    t.Ablauf > DateTime.UtcNow);
+
+            if (alterToken != null)
+            {
+                DB.PasswortResetTokens.Remove(alterToken);
+            }
+
+            var token = new PasswortResetToken
+            {
+                UserId = user.ID,
+                Token = Guid.NewGuid().ToString("N"),
+                Ablauf = DateTime.UtcNow.AddHours(1)
+            };
+
+            DB.PasswortResetTokens.Add(token);
+
+            await DB.SaveChangesAsync();
+
+            var resetLink =
+                $"{Nav.BaseUri}passwort-reset?token={token.Token}";
+
+            Console.WriteLine("🔥 VOR EMAIL CALL");
+
+            await _emailService.SendePasswortResetMail(
+                user.Email,
+                resetLink);
+
+            Console.WriteLine("🔥 NACH EMAIL CALL");
+
             erfolg = true;
-            return;
         }
-
-        var alterToken = await DB.PasswortResetTokens
-            .FirstOrDefaultAsync(t =>
-                t.UserId == user.ID &&
-                t.Ablauf > DateTime.UtcNow);
-
-        if (alterToken != null)
+        catch (Exception ex)
         {
-            DB.PasswortResetTokens.Remove(alterToken);
+            fehler = $"Fehler: {ex.Message}";
+            Console.WriteLine(ex.ToString());
         }
-
-        var token = new PasswortResetToken
+        finally
         {
-            UserId = user.ID,
-            Token = Guid.NewGuid().ToString("N"),
-            Ablauf = DateTime.UtcNow.AddHours(1)
-        };
-
-        DB.PasswortResetTokens.Add(token);
-        await DB.SaveChangesAsync();
-
-        var resetLink = $"{Nav.BaseUri}passwort-reset?token={token.Token}";
-
-        await EmailService.SendePasswortResetMail(user.Email, resetLink);
-
-        erfolg = true;
+            laden = false;
+        }
     }
 }
