@@ -16,45 +16,68 @@ namespace xAzubiLog.Services
 
         public async Task SendePasswortResetMail(string empfaenger, string resetLink)
         {
-            Console.WriteLine("🔥 EMAIL SERVICE WIRD AUFGERUFEN");
-            try
+            var message = new MimeMessage();
+
+            // Gmail als echter Absender
+            message.From.Add(
+                new MailboxAddress(
+                    "xAzubiLog",
+                    "tamarazxbel@gmail.com"));
+
+            message.To.Add(MailboxAddress.Parse(empfaenger));
+
+            message.Subject = "Passwort zurücksetzen";
+
+            var bodyBuilder = new BodyBuilder
             {
-                Console.WriteLine("SMTP START");
+                HtmlBody = $@"
+                <div style='font-family: Arial; padding: 20px;'>
 
-                var message = new MimeMessage();
-                message.From.Add(MailboxAddress.Parse("noreply@azubilog.de"));
-                message.To.Add(MailboxAddress.Parse(empfaenger));
-                message.Subject = "Passwort Reset";
+                    <h2>Passwort zurücksetzen</h2>
 
-                Console.WriteLine("Mail gebaut");
+                    <p>
+                        Du hast angefordert, dein Passwort zurückzusetzen.
+                    </p>
 
-                using var client = new MailKit.Net.Smtp.SmtpClient();
+                    <p>
+                        Klicke auf den Button:
+                    </p>
 
-                Console.WriteLine("Verbinde SMTP...");
+                    <a href='{resetLink}'
+                       style='
+                            display:inline-block;
+                            padding:12px 20px;
+                            background:#4CAF50;
+                            color:white;
+                            text-decoration:none;
+                            border-radius:8px;
+                            font-weight:bold;'>
+                        Passwort zurücksetzen
+                    </a>
 
-                await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    <p style='margin-top:20px; color:gray;'>
+                        Der Link ist 1 Stunde gültig.
+                    </p>
 
-                Console.WriteLine("Verbunden");
+                </div>"
+            };
 
-                await client.AuthenticateAsync("tamarazxbel@gmail.com", "sikp lnna eqdc nods");
+            message.Body = bodyBuilder.ToMessageBody();
 
-                Console.WriteLine("Authentifiziert");
+            using var client = new MailKit.Net.Smtp.SmtpClient();
 
-                await client.SendAsync(message);
+            await client.ConnectAsync(
+                "smtp.gmail.com",
+                587,
+                SecureSocketOptions.StartTls);
 
-                Console.WriteLine("Gesendet");
+            await client.AuthenticateAsync(
+                "tamarazxbel@gmail.com",
+                "sikp lnna eqdc nods");
 
-                await client.DisconnectAsync(true);
+            await client.SendAsync(message);
 
-                Console.WriteLine("SMTP DONE");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("SMTP ERROR:");
-                Console.WriteLine(ex.ToString());
-                throw;
-            }
+            await client.DisconnectAsync(true);
         }
-
     }
 }

@@ -15,7 +15,7 @@ namespace xAzubiLog.Data
         public DbSet<BerichtEintraege> BerichtEintraege { get; set; } = default!;
         public DbSet<Kategorie> Kategorien { get; set; } = default!;
         public DbSet<Ausbilder> Ausbilder { get; set; } = default!;
-        public DbSet<PasswortResetToken> PasswortResetTokens { get; set; } = default!;
+        public DbSet<PasswortResetToken> PasswortResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -223,8 +223,8 @@ Console.WriteLine($"EMAIL BYTES: {string.Join(",", email.Select(c => (int)c))}")
 
             await DB.SaveChangesAsync();
 
-            var resetLink =
-                $"{Nav.BaseUri}passwort-reset?token={token.Token}";
+                var resetLink =
+    $"https://dyslexic-evil-stargazer.ngrok-free.dev/passwort-reset?token={token.Token}";
 
             Console.WriteLine("🔥 VOR EMAIL CALL");
 

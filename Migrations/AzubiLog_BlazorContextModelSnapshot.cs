@@ -144,7 +144,7 @@ namespace xAzubiLog.Migrations
 
             modelBuilder.Entity("xAzubiLog.Models.PasswortResetToken", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -158,10 +158,7 @@ namespace xAzubiLog.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Verwendet")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
                     b.ToTable("PasswortResetTokens", (string)null);
                 });
