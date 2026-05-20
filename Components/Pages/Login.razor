@@ -186,12 +186,12 @@
     string? fehler;
 
     async Task LoginAsync()
-    {
-        fehler = null;
-        var user = await Auth.LoginAsync(email, passwort);
-        if (user != null)
-            Nav.NavigateTo("/");
-        else
-            fehler = "E-Mail oder Passwort falsch.";
-    }
+{
+    fehler = null;
+    var user = await Auth.LoginAsync(email, passwort);
+    if (user != null)
+        Nav.NavigateTo("/", forceLoad: true);
+    else
+        fehler = "E-Mail oder Passwort falsch.";
+}
 }
