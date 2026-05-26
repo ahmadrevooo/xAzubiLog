@@ -8,17 +8,7 @@
 <PageTitle>Digitales Berichtsheft</PageTitle>
 
 <section class="report-book-module">
-    <header class="module-header">
-        <div>
-            <span class="module-eyebrow">ERP-Modul</span>
-            <h1>Digitales Berichtsheft</h1>
-            <p>Arbeitseinträge für Auszubildende erfassen, prüfen und auswerten.</p>
-        </div>
-        <div class="module-meta">
-            <span>@selectedDate.ToString("dddd", GermanCulture)</span>
-            <strong>@selectedDate.ToString("dd. MMMM yyyy", GermanCulture)</strong>
-        </div>
-    </header>
+   
 
     @if (!string.IsNullOrWhiteSpace(statusMessage))
     {
@@ -74,7 +64,7 @@
     protected override async Task OnInitializedAsync()
     {
         StartNewEntry();
-        await RefreshAsync("Berichtsheft geladen.");
+        await RefreshAsync("");
     }
 
     /// <summary>
