@@ -1,0 +1,275 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using xAzubiLog.Models
+@using xAzubiLog.Services
+
+<EditForm EditContext="editContext" OnSubmit="HandleSubmitAsync" class="report-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger validation-box" />
+
+    <div class="form-toolbar">
+        <div>
+            <span class="module-eyebrow">Erfassung</span>
+            <h2>@(Entry.Id == 0 ? "Neuer Arbeitseintrag" : "Arbeitseintrag bearbeiten")</h2>
+        </div>
+        <span class="edit-state">@(Entry.Id == 0 ? "Neu" : "Bearbeitung")</span>
+    </div>
+
+    <div class="form-grid">
+        <label class="form-field span-2">
+            <span>Titel</span>
+            <InputText class="form-control business-control" @bind-Value="Entry.Titel" placeholder="Kurzer Titel des Arbeitseintrags" />
+            <ValidationMessage For="() => Entry.Titel" />
+        </label>
+
+        <label class="form-field span-2">
+            <span>Beschreibung</span>
+            <InputTextArea class="form-control business-control text-area" @bind-Value="Entry.Beschreibung" placeholder="Beschreibe die ausgeführte Tätigkeit" />
+            <ValidationMessage For="() => Entry.Beschreibung" />
+        </label>
+
+        <label class="form-field">
+            <span>Datum</span>
+            <InputDate class="form-control business-control" @bind-Value="Entry.Datum" @bind-Value:after="HandleDateChangedAsync" />
+            <ValidationMessage For="() => Entry.Datum" />
+        </label>
+
+        <label class="form-field">
+            <span>Name des Betreuers</span>
+            <InputText class="form-control business-control" @bind-Value="TrainerNameProxy" placeholder="z. B. Max Mustermann" />
+        </label>
+
+        <label class="form-field">
+            <span>Startzeit</span>
+            <input type="time" class="form-control business-control" value="@startTimeText" @onchange="HandleStartTimeChanged" />
+            <ValidationMessage For="() => Entry.Startzeit" />
+        </label>
+
+        <label class="form-field">
+            <span>Endzeit</span>
+            <input type="time" class="form-control business-control" value="@endTimeText" @onchange="HandleEndTimeChanged" />
+            <ValidationMessage For="() => Entry.Endzeit" />
+        </label>
+
+        <label class="form-field">
+            <span>Auftragsnummer oder Vorgangsnummer</span>
+            <InputText class="form-control business-control" @bind-Value="Entry.Auftragsnummer" placeholder="Optional" />
+        </label>
+
+        <label class="form-field">
+            <span>Kategorie</span>
+            <InputSelect class="form-select business-control" @bind-Value="Entry.KategorieId">
+                <option value="">Keine Kategorie</option>
+                @foreach (var category in Categories)
+                {
+                    <option value="@category.ID">@category.Name</option>
+                }
+            </InputSelect>
+        </label>
+
+        <div class="category-row span-2">
+            <label class="form-field">
+                <span>Neue Kategorie</span>
+                <InputText class="form-control business-control" @bind-Value="NewCategoryNameProxy" placeholder="Kategorie hinzufügen" />
+            </label>
+
+            <label class="form-field color-field">
+                <span>Farbe</span>
+                <input type="color" class="form-control form-control-color category-color" @bind="NewCategoryColorProxy" />
+            </label>
+        </div>
+
+        <div class="duration-box span-2">
+            <span>Automatisch berechnete Dauer</span>
+            <strong>@Duration.ToString("0.##") h</strong>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="btn btn-light business-button" @onclick="OnNewEntry">
+            <span aria-hidden="true">+</span>
+            Neuer Eintrag
+        </button>
+        @if (Entry.Id != 0)
+        {
+            <button type="button" class="btn btn-outline-danger business-button" @onclick="OnDeleteEntry" disabled="@IsSaving">
+                <span aria-hidden="true">×</span>
+                Löschen
+            </button>
+        }
+        <button type="submit" class="btn btn-primary business-button" disabled="@IsSaving">
+            <span aria-hidden="true">✓</span>
+            Speichern
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? validationMessages;
+    private BerichtEintrag? previousEntry;
+    private string startTimeText = "";
+    private string endTimeText = "";
+
+    [Parameter, EditorRequired] public BerichtEintrag Entry { get; set; } = default!;
+    [Parameter] public IReadOnlyList<Kategorie> Categories { get; set; } = [];
+    [Parameter] public string TrainerName { get; set; } = "";
+    [Parameter] public EventCallback<string> TrainerNameChanged { get; set; }
+    [Parameter] public string NewCategoryName { get; set; } = "";
+    [Parameter] public EventCallback<string> NewCategoryNameChanged { get; set; }
+    [Parameter] public string NewCategoryColor { get; set; } = "#334155";
+    [Parameter] public EventCallback<string> NewCategoryColorChanged { get; set; }
+    [Parameter] public bool IsSaving { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnNewEntry { get; set; }
+    [Parameter] public EventCallback OnDeleteEntry { get; set; }
+    [Parameter] public EventCallback<DateTime> OnDateChanged { get; set; }
+
+    private decimal Duration => ReportBookService.CalculateDuration(Entry.Startzeit, Entry.Endzeit);
+
+    private string TrainerNameProxy
+    {
+        get => TrainerName;
+        set
+        {
+            TrainerName = value;
+            _ = TrainerNameChanged.InvokeAsync(value);
+        }
+    }
+
+    private string NewCategoryNameProxy
+    {
+        get => NewCategoryName;
+        set
+        {
+            NewCategoryName = value;
+            _ = NewCategoryNameChanged.InvokeAsync(value);
+        }
+    }
+
+    private string NewCategoryColorProxy
+    {
+        get => NewCategoryColor;
+        set
+        {
+            NewCategoryColor = value;
+            _ = NewCategoryColorChanged.InvokeAsync(value);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (previousEntry == Entry && editContext is not null)
+        {
+            return;
+        }
+
+        previousEntry = Entry;
+        editContext = new EditContext(Entry);
+        validationMessages = new ValidationMessageStore(editContext);
+        editContext.OnValidationRequested += ValidateEntry;
+        SyncTimeText();
+    }
+
+    /// <summary>
+    /// Validates the current EF model and submits it when all business rules pass.
+    /// </summary>
+    private async Task HandleSubmitAsync()
+    {
+        if (editContext is null || !editContext.Validate())
+        {
+            return;
+        }
+
+        Entry.Dauer = Duration;
+        await OnSave.InvokeAsync();
+    }
+
+    /// <summary>
+    /// Keeps start and end times on the selected report date.
+    /// </summary>
+    private async Task HandleDateChangedAsync()
+    {
+        ApplyStartTime();
+        ApplyEndTime();
+        await OnDateChanged.InvokeAsync(Entry.Datum);
+    }
+
+    /// <summary>
+    /// Updates the start time text and applies it to the model.
+    /// </summary>
+    private void HandleStartTimeChanged(ChangeEventArgs args)
+    {
+        startTimeText = args.Value?.ToString() ?? "";
+        ApplyStartTime();
+    }
+
+    /// <summary>
+    /// Updates the end time text and applies it to the model.
+    /// </summary>
+    private void HandleEndTimeChanged(ChangeEventArgs args)
+    {
+        endTimeText = args.Value?.ToString() ?? "";
+        ApplyEndTime();
+    }
+
+    /// <summary>
+    /// Applies the selected start time to the report entry.
+    /// </summary>
+    private void ApplyStartTime()
+    {
+        if (TimeOnly.TryParse(startTimeText, out var startTime))
+        {
+            Entry.Startzeit = Entry.Datum.Date.Add(startTime.ToTimeSpan());
+        }
+    }
+
+    /// <summary>
+    /// Applies the selected end time to the report entry.
+    /// </summary>
+    private void ApplyEndTime()
+    {
+        if (TimeOnly.TryParse(endTimeText, out var endTime))
+        {
+            Entry.Endzeit = Entry.Datum.Date.Add(endTime.ToTimeSpan());
+        }
+    }
+
+    /// <summary>
+    /// Adds UI validation rules without changing the existing database model.
+    /// </summary>
+    private void ValidateEntry(object? sender, ValidationRequestedEventArgs args)
+    {
+        if (validationMessages is null || editContext is null)
+        {
+            return;
+        }
+
+        validationMessages.Clear();
+
+        if (string.IsNullOrWhiteSpace(Entry.Titel))
+        {
+            validationMessages.Add(() => Entry.Titel, "Bitte einen Titel eingeben.");
+        }
+
+        if (string.IsNullOrWhiteSpace(Entry.Beschreibung))
+        {
+            validationMessages.Add(() => Entry.Beschreibung, "Bitte eine Beschreibung eingeben.");
+        }
+
+        if (Entry.Endzeit <= Entry.Startzeit)
+        {
+            validationMessages.Add(() => Entry.Endzeit, "Die Endzeit muss nach der Startzeit liegen.");
+        }
+
+        if (Entry.Startzeit.Date != Entry.Datum.Date || Entry.Endzeit.Date != Entry.Datum.Date)
+        {
+            validationMessages.Add(() => Entry.Datum, "Startzeit und Endzeit müssen zum ausgewählten Datum passen.");
+        }
+    }
+
+    private void SyncTimeText()
+    {
+        startTimeText = Entry.Startzeit == default ? "08:00" : Entry.Startzeit.ToString("HH:mm");
+        endTimeText = Entry.Endzeit == default ? "09:00" : Entry.Endzeit.ToString("HH:mm");
+    }
+}

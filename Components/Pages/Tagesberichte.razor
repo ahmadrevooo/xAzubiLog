@@ -1,0 +1,210 @@
+@page "/tagesberichte"
+@rendermode InteractiveServer
+@using System.Globalization
+@using xAzubiLog.Models
+@using xAzubiLog.Services
+@inject ReportBookService ReportBookService
+
+<PageTitle>Digitales Berichtsheft</PageTitle>
+
+<section class="report-book-module">
+    <header class="module-header">
+        <div>
+            <span class="module-eyebrow">ERP-Modul</span>
+            <h1>Digitales Berichtsheft</h1>
+            <p>Arbeitseinträge für Auszubildende erfassen, prüfen und auswerten.</p>
+        </div>
+        <div class="module-meta">
+            <span>@selectedDate.ToString("dddd", GermanCulture)</span>
+            <strong>@selectedDate.ToString("dd. MMMM yyyy", GermanCulture)</strong>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert alert-light border status-alert" role="status">
+            @statusMessage
+        </div>
+    }
+
+    <div class="report-layout">
+        <section class="module-card form-card">
+            <DailyReportForm Entry="currentEntry"
+                             Categories="categories"
+                             @bind-TrainerName="trainerName"
+                             @bind-NewCategoryName="newCategoryName"
+                             @bind-NewCategoryColor="newCategoryColor"
+                             IsSaving="isSaving"
+                             OnSave="SaveEntryAsync"
+                             OnNewEntry="StartNewEntry"
+                             OnDeleteEntry="DeleteSelectedEntryAsync"
+                             OnDateChanged="ChangeSelectedDateAsync" />
+        </section>
+
+        <aside class="module-card overview-card">
+            <DailyOverview SelectedDate="selectedDate"
+                           Entries="dailyEntries"
+                           SelectedEntryId="selectedEntryId"
+                           OnEntrySelected="SelectEntryAsync" />
+        </aside>
+    </div>
+
+    <section class="module-card week-section">
+        <WeeklyOverview SelectedDate="selectedDate"
+                        Entries="weeklyEntries"
+                        OnDateSelected="ChangeSelectedDateAsync" />
+    </section>
+</section>
+
+@code {
+    private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
+
+    private BerichtEintrag currentEntry = new();
+    private IReadOnlyList<Kategorie> categories = [];
+    private IReadOnlyList<BerichtEintrag> dailyEntries = [];
+    private IReadOnlyList<BerichtEintrag> weeklyEntries = [];
+    private DateTime selectedDate = DateTime.Today;
+    private int? selectedEntryId;
+    private string trainerName = "";
+    private string newCategoryName = "";
+    private string newCategoryColor = "#334155";
+    private string? statusMessage;
+    private bool isSaving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        StartNewEntry();
+        await RefreshAsync("Berichtsheft geladen.");
+    }
+
+    /// <summary>
+    /// Persists the current entry and refreshes all overviews.
+    /// </summary>
+    private async Task SaveEntryAsync()
+    {
+        isSaving = true;
+
+        try
+        {
+            await ReportBookService.SaveEntryAsync(currentEntry, trainerName, newCategoryName, newCategoryColor);
+            await RefreshAsync("Eintrag wurde gespeichert.");
+            StartNewEntry();
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    /// <summary>
+    /// Selects an existing entry and loads it into the form.
+    /// </summary>
+    private async Task SelectEntryAsync(int entryId)
+    {
+        var entry = await ReportBookService.GetEntryAsync(entryId);
+
+        if (entry is null)
+        {
+            await RefreshAsync("Der Eintrag wurde nicht gefunden.");
+            return;
+        }
+
+        currentEntry = CopyEntry(entry);
+        selectedEntryId = entry.Id;
+        selectedDate = entry.Datum.Date;
+        trainerName = entry.Ausbilder?.Name ?? "";
+        newCategoryName = "";
+        newCategoryColor = "#334155";
+        statusMessage = "Eintrag zur Bearbeitung geladen.";
+    }
+
+    /// <summary>
+    /// Deletes the selected entry after a user action.
+    /// </summary>
+    private async Task DeleteSelectedEntryAsync()
+    {
+        if (selectedEntryId is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+
+        try
+        {
+            await ReportBookService.DeleteEntryAsync(selectedEntryId.Value);
+            await RefreshAsync("Eintrag wurde gelöscht.");
+            StartNewEntry();
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    /// <summary>
+    /// Starts a clean draft for the selected day.
+    /// </summary>
+    private void StartNewEntry()
+    {
+        currentEntry = ReportBookService.CreateDraftEntry(selectedDate);
+        selectedEntryId = null;
+        trainerName = "";
+        newCategoryName = "";
+        newCategoryColor = "#334155";
+    }
+
+    /// <summary>
+    /// Changes the working day and updates daily and weekly data.
+    /// </summary>
+    private async Task ChangeSelectedDateAsync(DateTime date)
+    {
+        selectedDate = date.Date;
+        currentEntry.Datum = selectedDate;
+        currentEntry.Startzeit = selectedDate.Add(currentEntry.Startzeit.TimeOfDay);
+        currentEntry.Endzeit = selectedDate.Add(currentEntry.Endzeit.TimeOfDay);
+        await RefreshAsync();
+    }
+
+    /// <summary>
+    /// Reloads categories and report entries from the database.
+    /// </summary>
+    private async Task RefreshAsync(string? message = null)
+    {
+        var data = await ReportBookService.LoadAsync(selectedDate);
+        categories = data.Categories;
+        dailyEntries = data.DailyEntries;
+        weeklyEntries = data.WeeklyEntries;
+        statusMessage = message ?? $"Aktualisiert um {DateTime.Now:HH:mm} Uhr.";
+    }
+
+    /// <summary>
+    /// Creates a detached copy so the overview list is not modified before saving.
+    /// </summary>
+    private static BerichtEintrag CopyEntry(BerichtEintrag entry)
+    {
+        return new BerichtEintrag
+        {
+            Id = entry.Id,
+            BenutzerId = entry.BenutzerId,
+            AusbilderId = entry.AusbilderId,
+            Ausbilder = entry.Ausbilder,
+            KategorieId = entry.KategorieId,
+            Kategorie = entry.Kategorie,
+            WochenberichtId = entry.WochenberichtId,
+            Datum = entry.Datum,
+            Tagestyp = entry.Tagestyp,
+            Auftragsnummer = entry.Auftragsnummer,
+            Titel = entry.Titel,
+            Beschreibung = entry.Beschreibung,
+            Notiz = entry.Notiz,
+            Fach = entry.Fach,
+            Startzeit = entry.Startzeit,
+            Endzeit = entry.Endzeit,
+            Dauer = entry.Dauer,
+            Status = entry.Status,
+            ErstelltAm = entry.ErstelltAm,
+            GeändertAm = entry.GeändertAm
+        };
+    }
+}
