@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using xAzubiLog.Data;
 using xAzubiLog.Components;
+using xAzubiLog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
