@@ -1,0 +1,456 @@
+﻿@page "/konto"
+@rendermode InteractiveServer
+@inject xAzubiLog.Services.AuthService Auth
+@inject xAzubiLog.Data.AzubiLog_BlazorContext DB
+@inject NavigationManager Nav
+@using Microsoft.EntityFrameworkCore
+@using xAzubiLog.Models
+
+<PageTitle>Konto – xAzubiLog</PageTitle>
+
+@if (Auth.CurrentUser == null)
+{
+    Nav.NavigateTo("/login", forceLoad: true);
+    return;
+}
+
+<div class="konto-wrapper">
+    <div class="konto-card">
+
+        <!-- Avatar -->
+        <div class="avatar-section">
+            <div class="avatar-circle">
+                @Auth.CurrentUser.Vorname[0]@Auth.CurrentUser.Nachname[0]
+            </div>
+            <div class="avatar-info">
+                <div class="avatar-name">@Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname</div>
+                <div class="avatar-role">@Auth.CurrentUser.Rolle</div>
+            </div>
+        </div>
+
+        @if (erfolgMeldung != null)
+        {
+            <div class="alert-success">@erfolgMeldung</div>
+        }
+        @if (fehler != null)
+        {
+            <div class="alert-error">@fehler</div>
+        }
+
+        <!-- Profil bearbeiten -->
+        <div class="section-title">Profildaten</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Vorname</label>
+                <input class="konto-input" @bind="vorname" />
+            </div>
+            <div class="form-group">
+                <label>Nachname</label>
+                <input class="konto-input" @bind="nachname" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>E-Mail</label>
+            <input class="konto-input" type="email" @bind="email" />
+        </div>
+
+        <button class="btn-save"
+        @onclick="ProfilSpeichern"
+        disabled="@speichernLaeuft">
+    @(speichernLaeuft ? "Speichern..." : "Änderungen speichern")
+</button>
+
+        <hr class="divider" />
+        <!-- Passwort ändern -->
+        <div class="section-title">Passwort ändern</div>
+
+        <div class="form-group">
+            <label>Aktuelles Passwort</label>
+            <input class="konto-input" type="password" @bind="altesPasswort" />
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Neues Passwort</label>
+                <input class="konto-input" type="password" @bind="neuesPasswort" />
+            </div>
+            <div class="form-group">
+                <label>Passwort bestätigen</label>
+                <input class="konto-input" type="password" @bind="passwortBestaetigen" />
+            </div>
+        </div>
+
+        <button class="btn-save"
+        @onclick="PasswortAendern"
+        disabled="@speichernPasswort">
+    @(speichernPasswort ? "Speichern..." : "Passwort ändern")
+</button>
+
+    </div>
+</div>
+
+<style>
+    .konto-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 3rem 1rem;
+        min-height: 100vh;
+        background: #0d1117;
+    }
+
+    .konto-card {
+        background: #161b22;
+        border-radius: 16px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 700px;
+        color: white;
+        border: 1px solid #30363d;
+    }
+
+    .avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .avatar-circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00ff75, #3700ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: white;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+    
+.avatar-circle:hover {
+    box-shadow: 0 0 15px rgba(59,130,246,0.7);
+    transform: scale(1.05);
+}
+
+
+    .avatar-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .avatar-role {
+        font-size: 0.85rem;
+        color: #8b949e;
+        margin-top: 0.25rem;
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #8b949e;
+        margin-bottom: 1rem;
+        margin-top: 1.5rem;
+        transition: color 0.2s ease;
+    }
+
+    
+.section-title:hover {
+    color: #3b82f6;
+}
+
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        color: #8b949e;
+    }
+
+    .konto-input {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        color: white;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .konto-input:focus {
+        border-color: #00ff75;
+    }
+
+.btn-save {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glow + Lift */
+.btn-save:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+    transform: translateY(-3px);
+}
+
+/* Klick Effekt */
+.btn-save:active {
+    transform: scale(0.96);
+}
+
+.btn-save::after {
+    content: "";
+    position: absolute;
+    background: rgba(59,130,246,0.3);
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+}
+
+.btn-save:active::after {
+    width: 200px;
+    height: 200px;
+    opacity: 1;
+    transition: width 0.4s, height 0.4s, opacity 0.6s;
+}
+
+
+.btn-save::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.7);
+}
+
+.btn-save:hover::before {
+    opacity: 1;
+}
+
+.konto-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+}
+
+    .konto-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.konto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+
+    .divider {
+        border-color: #30363d;
+        margin: 2rem 0;
+    }
+
+    .alert-success {
+    animation: slideFade 0.3s ease;
+}
+
+@@keyframes slideFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    .alert-error {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid #ff6b6b;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+</style>
+
+@code {
+    string vorname = "";
+    string nachname = "";
+    string email = "";
+    string altesPasswort = "";
+    string neuesPasswort = "";
+    string passwortBestaetigen = "";
+
+    string? erfolgMeldung;
+    string? fehler;
+
+    bool speichernLaeuft = false;
+    bool speichernPasswort = false;
+
+    protected override void OnInitialized()
+    {
+        if (Auth.CurrentUser == null) return;
+
+        vorname = Auth.CurrentUser.Vorname;
+        nachname = Auth.CurrentUser.Nachname;
+        email = Auth.CurrentUser.Email;
+    }
+
+    async Task ProfilSpeichern()
+    {
+        fehler = null;
+        erfolgMeldung = null;
+
+        speichernLaeuft = true;
+
+        if (string.IsNullOrWhiteSpace(vorname) ||
+            string.IsNullOrWhiteSpace(nachname) ||
+            string.IsNullOrWhiteSpace(email))
+        {
+            fehler = "Bitte alle Felder ausfüllen.";
+            speichernLaeuft = false;
+            return;
+        }
+
+        var nameRegex = new System.Text.RegularExpressions.Regex(@"^[^\d]+$");
+        if (!nameRegex.IsMatch(vorname) || !nameRegex.IsMatch(nachname))
+        {
+            fehler = "Vor- und Nachname dürfen keine Zahlen enthalten.";
+            speichernLaeuft = false;
+            return;
+        }
+
+        var emailRegex = new System.Text.RegularExpressions.Regex(
+            @"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$");
+
+        if (!emailRegex.IsMatch(email))
+        {
+            fehler = "Bitte eine gültige E-Mail-Adresse eingeben.";
+            speichernLaeuft = false;
+            return;
+        }
+
+        var user = await DB.Users.FindAsync(Auth.CurrentUser.ID);
+        if (user == null)
+        {
+            speichernLaeuft = false;
+            return;
+        }
+
+        user.Vorname = vorname;
+        user.Nachname = nachname;
+        user.Email = email;
+
+        await DB.SaveChangesAsync();
+
+        // UI sofort aktualisieren
+        Auth.CurrentUser.Vorname = vorname;
+        Auth.CurrentUser.Nachname = nachname;
+        Auth.CurrentUser.Email = email;
+
+        erfolgMeldung = "Profil erfolgreich gespeichert";
+
+        speichernLaeuft = false;
+
+        await Task.Delay(2500);
+        erfolgMeldung = null;
+        StateHasChanged();
+    }
+
+    async Task PasswortAendern()
+    {
+        fehler = null;
+        erfolgMeldung = null;
+
+        speichernPasswort = true;
+
+        if (string.IsNullOrWhiteSpace(altesPasswort) ||
+            string.IsNullOrWhiteSpace(neuesPasswort) ||
+            string.IsNullOrWhiteSpace(passwortBestaetigen))
+        {
+            fehler = "Bitte alle Passwortfelder ausfüllen.";
+            speichernPasswort = false;
+            return;
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(altesPasswort, Auth.CurrentUser!.PasswortHash))
+        {
+            fehler = "Aktuelles Passwort ist falsch.";
+            speichernPasswort = false;
+            return;
+        }
+
+        if (neuesPasswort != passwortBestaetigen)
+        {
+            fehler = "Neue Passwörter stimmen nicht überein.";
+            speichernPasswort = false;
+            return;
+        }
+
+        if (neuesPasswort.Length < 6)
+        {
+            fehler = "Passwort muss mindestens 6 Zeichen lang sein.";
+            speichernPasswort = false;
+            return;
+        }
+
+        var user = await DB.Users.FindAsync(Auth.CurrentUser.ID);
+        if (user == null)
+        {
+            speichernPasswort = false;
+            return;
+        }
+
+        user.PasswortHash = BCrypt.Net.BCrypt.HashPassword(neuesPasswort);
+        await DB.SaveChangesAsync();
+
+        Auth.CurrentUser.PasswortHash = user.PasswortHash;
+
+        // Felder resetten
+        altesPasswort = "";
+        neuesPasswort = "";
+        passwortBestaetigen = "";
+
+        erfolgMeldung = "Passwort erfolgreich geändert ✅";
+
+        speichernPasswort = false;
+
+        await Task.Delay(2500);
+        erfolgMeldung = null;
+        StateHasChanged();
+    }
+}
+``
