@@ -94,7 +94,7 @@ namespace xAzubiLog.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BerichtEintrag",
+                name: "BerichtEintraege",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -119,25 +119,25 @@ namespace xAzubiLog.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BerichtEintrag", x => x.Id);
+                    table.PrimaryKey("PK_BerichtEintraege", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BerichtEintrag_Ausbilder_AusbilderId",
+                        name: "FK_BerichtEintraege_Ausbilder_AusbilderId",
                         column: x => x.AusbilderId,
                         principalTable: "Ausbilder",
                         principalColumn: "ID");
                     table.ForeignKey(
-                        name: "FK_BerichtEintrag_Kategorie_KategorieId",
+                        name: "FK_BerichtEintraege_Kategorie_KategorieId",
                         column: x => x.KategorieId,
                         principalTable: "Kategorie",
                         principalColumn: "ID");
                     table.ForeignKey(
-                        name: "FK_BerichtEintrag_User_BenutzerId",
+                        name: "FK_BerichtEintraege_User_BenutzerId",
                         column: x => x.BenutzerId,
                         principalTable: "User",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BerichtEintrag_Wochenbericht_WochenberichtId",
+                        name: "FK_BerichtEintraege_Wochenbericht_WochenberichtId",
                         column: x => x.WochenberichtId,
                         principalTable: "Wochenbericht",
                         principalColumn: "Id",
@@ -145,23 +145,23 @@ namespace xAzubiLog.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BerichtEintrag_AusbilderId",
-                table: "BerichtEintrag",
+                name: "IX_BerichtEintraege_AusbilderId",
+                table: "BerichtEintraege",
                 column: "AusbilderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BerichtEintrag_BenutzerId",
-                table: "BerichtEintrag",
+                name: "IX_BerichtEintraege_BenutzerId",
+                table: "BerichtEintraege",
                 column: "BenutzerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BerichtEintrag_KategorieId",
-                table: "BerichtEintrag",
+                name: "IX_BerichtEintraege_KategorieId",
+                table: "BerichtEintraege",
                 column: "KategorieId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BerichtEintrag_WochenberichtId",
-                table: "BerichtEintrag",
+                name: "IX_BerichtEintraege_WochenberichtId",
+                table: "BerichtEintraege",
                 column: "WochenberichtId");
 
             migrationBuilder.CreateIndex(
@@ -179,7 +179,7 @@ namespace xAzubiLog.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BerichtEintrag");
+                name: "BerichtEintraege");
 
             migrationBuilder.DropTable(
                 name: "Ausbilder");

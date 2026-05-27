@@ -1,104 +1,104 @@
-﻿@page "/berichteintrags/create"
+﻿@page "/BerichtEintraeges/create"
 @using Microsoft.EntityFrameworkCore
 @using xAzubiLog.Models
-@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
+@inject IDbContextFactory<xAzubiLog.Data.AzubiLog_BlazorContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
 
-<h2>BerichtEintrag</h2>
+<h2>BerichtEintraege</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="BerichtEintrag" OnValidSubmit="AddBerichtEintrag" FormName="create" Enhance>
+        <EditForm method="post" Model="BerichtEintraege" OnValidSubmit="AddBerichtEintraege" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="benutzerid" class="form-label">BenutzerId:</label> 
-                <InputNumber id="benutzerid" @bind-Value="BerichtEintrag.BenutzerId" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.BenutzerId" class="text-danger" /> 
+                <InputNumber id="benutzerid" @bind-Value="BerichtEintraege.BenutzerId" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.BenutzerId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="ausbilderid" class="form-label">AusbilderId:</label> 
-                <InputNumber id="ausbilderid" @bind-Value="BerichtEintrag.AusbilderId" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.AusbilderId" class="text-danger" /> 
+                <InputNumber id="ausbilderid" @bind-Value="BerichtEintraege.AusbilderId" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.AusbilderId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="kategorieid" class="form-label">KategorieId:</label> 
-                <InputNumber id="kategorieid" @bind-Value="BerichtEintrag.KategorieId" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.KategorieId" class="text-danger" /> 
+                <InputNumber id="kategorieid" @bind-Value="BerichtEintraege.KategorieId" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.KategorieId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="wochenberichtid" class="form-label">WochenberichtId:</label> 
-                <InputNumber id="wochenberichtid" @bind-Value="BerichtEintrag.WochenberichtId" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.WochenberichtId" class="text-danger" /> 
+                <InputNumber id="wochenberichtid" @bind-Value="BerichtEintraege.WochenberichtId" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.WochenberichtId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="datum" class="form-label">Datum:</label> 
-                <InputDate id="datum" @bind-Value="BerichtEintrag.Datum" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Datum" class="text-danger" /> 
+                <InputDate id="datum" @bind-Value="BerichtEintraege.Datum" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Datum" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="tagestyp" class="form-label">Tagestyp:</label> 
-                <InputText id="tagestyp" @bind-Value="BerichtEintrag.Tagestyp" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Tagestyp" class="text-danger" /> 
+                <InputText id="tagestyp" @bind-Value="BerichtEintraege.Tagestyp" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Tagestyp" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="auftragsnummer" class="form-label">Auftragsnummer:</label> 
-                <InputText id="auftragsnummer" @bind-Value="BerichtEintrag.Auftragsnummer" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Auftragsnummer" class="text-danger" /> 
+                <InputText id="auftragsnummer" @bind-Value="BerichtEintraege.Auftragsnummer" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Auftragsnummer" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="titel" class="form-label">Titel:</label> 
-                <InputText id="titel" @bind-Value="BerichtEintrag.Titel" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Titel" class="text-danger" /> 
+                <InputText id="titel" @bind-Value="BerichtEintraege.Titel" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Titel" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="beschreibung" class="form-label">Beschreibung:</label> 
-                <InputText id="beschreibung" @bind-Value="BerichtEintrag.Beschreibung" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Beschreibung" class="text-danger" /> 
+                <InputText id="beschreibung" @bind-Value="BerichtEintraege.Beschreibung" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Beschreibung" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="notiz" class="form-label">Notiz:</label> 
-                <InputText id="notiz" @bind-Value="BerichtEintrag.Notiz" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Notiz" class="text-danger" /> 
+                <InputText id="notiz" @bind-Value="BerichtEintraege.Notiz" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Notiz" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="fach" class="form-label">Fach:</label> 
-                <InputText id="fach" @bind-Value="BerichtEintrag.Fach" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Fach" class="text-danger" /> 
+                <InputText id="fach" @bind-Value="BerichtEintraege.Fach" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Fach" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="startzeit" class="form-label">Startzeit:</label> 
-                <InputDate id="startzeit" @bind-Value="BerichtEintrag.Startzeit" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Startzeit" class="text-danger" /> 
+                <InputDate id="startzeit" @bind-Value="BerichtEintraege.Startzeit" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Startzeit" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="endzeit" class="form-label">Endzeit:</label> 
-                <InputDate id="endzeit" @bind-Value="BerichtEintrag.Endzeit" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Endzeit" class="text-danger" /> 
+                <InputDate id="endzeit" @bind-Value="BerichtEintraege.Endzeit" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Endzeit" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="dauer" class="form-label">Dauer:</label> 
-                <InputNumber id="dauer" @bind-Value="BerichtEintrag.Dauer" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Dauer" class="text-danger" /> 
+                <InputNumber id="dauer" @bind-Value="BerichtEintraege.Dauer" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Dauer" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="status" class="form-label">Status:</label> 
-                <InputText id="status" @bind-Value="BerichtEintrag.Status" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.Status" class="text-danger" /> 
+                <InputText id="status" @bind-Value="BerichtEintraege.Status" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.Status" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="erstelltam" class="form-label">ErstelltAm:</label> 
-                <InputDate id="erstelltam" @bind-Value="BerichtEintrag.ErstelltAm" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.ErstelltAm" class="text-danger" /> 
+                <InputDate id="erstelltam" @bind-Value="BerichtEintraege.ErstelltAm" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.ErstelltAm" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="geändertam" class="form-label">GeändertAm:</label> 
-                <InputDate id="geändertam" @bind-Value="BerichtEintrag.GeändertAm" class="form-control" /> 
-                <ValidationMessage For="() => BerichtEintrag.GeändertAm" class="text-danger" /> 
+                <InputDate id="geändertam" @bind-Value="BerichtEintraege.GeändertAm" class="form-control" /> 
+                <ValidationMessage For="() => BerichtEintraege.GeändertAm" class="text-danger" /> 
             </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
@@ -106,21 +106,21 @@
 </div>
 
 <div>
-    <a href="/berichteintrags">Back to List</a>
+    <a href="/BerichtEintraeges">Back to List</a>
 </div>
 
 @code {
     [SupplyParameterFromForm]
-    private BerichtEintrag BerichtEintrag { get; set; } = default!;
+    private BerichtEintraege BerichtEintraege { get; set; } = default!;
 
-    protected override void OnInitialized() => BerichtEintrag ??= new();
+    protected override void OnInitialized() => BerichtEintraege ??= new();
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddBerichtEintrag()
+    private async Task AddBerichtEintraege()
     {
         using var context = DbFactory.CreateDbContext();
-        context.BerichtEintrag.Add(BerichtEintrag);
+        context.BerichtEintraege.Add(BerichtEintraege);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/berichteintrags");
+        NavigationManager.NavigateTo("/BerichtEintraeges");
     }
 }

@@ -1,22 +1,24 @@
 ﻿@inherits LayoutComponentBase
+@inject xAzubiLog.Services.ThemeService Theme
+@inject IJSRuntime JS
 
-<div class="page d-flex flex-column" style="min-height: 100vh; background-color: #000000; color: #ffffff;">
+<div>
+    <NavMenu />
 
-    <!-- Top Navigation -->
-    <header class="border-bottom" style="border-color: #222 !important;">
-        <NavMenu />
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow-1">
-        <article class="content">
-            @Body
-        </article>
+    <main>
+        @Body
     </main>
-
-    <footer class="border-top py-4 mt-auto" style="border-color: #222 !important;">
-        <div class="container px-4 text-center text-muted small">
-            xAzubiLog &copy; 2026
-        </div>
-    </footer>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Theme.InitializeAsync(JS);
+            await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
+
+            StateHasChanged();
+        }
+    }
+}

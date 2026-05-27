@@ -1,0 +1,208 @@
+﻿@page "/passwort-reset"
+@rendermode InteractiveServer
+
+@using xAzubiLog.Data
+@using xAzubiLog.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject AzubiLog_BlazorContext DB
+@inject NavigationManager Nav
+
+<PageTitle>Passwort zurücksetzen – xAzubiLog</PageTitle>
+
+<div class="login-wrapper">
+    <div class="card">
+        <div class="card2">
+
+            <div class="form">
+
+                <p id="heading">Passwort zurücksetzen</p>
+
+                @if (!string.IsNullOrEmpty(fehler))
+                {
+                    <div class="error-box">
+                        @fehler
+                    </div>
+                }
+
+                @if (erfolg)
+                {
+                    <div class="success-box">
+                        Passwort erfolgreich geändert!
+                    </div>
+                }
+
+                <div class="field">
+                    <input class="input-field"
+                           type="password"
+                           placeholder="Neues Passwort"
+                           @bind="neuesPasswort" />
+                </div>
+
+                <div class="field">
+                    <input class="input-field"
+                           type="password"
+                           placeholder="Passwort bestätigen"
+                           @bind="passwortBestaetigen" />
+                </div>
+
+                <div class="btn">
+                    <button class="button1"
+                            @onclick="PasswortZuruecksetzen">
+                        Passwort ändern
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #171717;
+    }
+
+    .card {
+        background-image: linear-gradient(163deg, #00ff75 0%, #3700ff 100%);
+        border-radius: 22px;
+        padding: 2px;
+    }
+
+    .card2 {
+        border-radius: 20px;
+        background: #171717;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 2em;
+        min-width: 340px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 0;
+        color: white;
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .field {
+        display: flex;
+        align-items: center;
+        border-radius: 25px;
+        padding: 0.8em;
+        background-color: #171717;
+        box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+    }
+
+    .input-field {
+        background: none;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .btn {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .button1 {
+        padding: 0.8em 1.5em;
+        border-radius: 8px;
+        border: none;
+        background-color: #252525;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .button1:hover {
+        background-color: #333;
+    }
+
+    .error-box {
+        color: #ff6b6b;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .success-box {
+        color: #00ff75;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+</style>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? token { get; set; }
+
+    private string neuesPasswort = "";
+    private string passwortBestaetigen = "";
+    private string fehler = "";
+    private bool erfolg = false;
+
+    private async Task PasswortZuruecksetzen()
+    {
+        fehler = "";
+        erfolg = false;
+
+        if (string.IsNullOrWhiteSpace(neuesPasswort) || string.IsNullOrWhiteSpace(passwortBestaetigen))
+        {
+            fehler = "Bitte alle Felder ausfuellen.";
+            return;
+        }
+
+        if (neuesPasswort != passwortBestaetigen)
+        {
+            fehler = "Die Passwoerter stimmen nicht ueberein.";
+            return;
+        }
+
+        if (neuesPasswort.Length < 6)
+        {
+            fehler = "Passwort muss mindestens 6 Zeichen lang sein.";
+            return;
+        }
+
+        var resetToken = await DB.PasswortResetTokens
+            .FirstOrDefaultAsync(t => t.Token == token && t.Ablauf > DateTime.UtcNow);
+
+        if (resetToken == null)
+        {
+            fehler = "Link ungueltig oder abgelaufen.";
+            return;
+        }
+
+        var user = await DB.Users.FirstOrDefaultAsync(u => u.ID == resetToken.UserId);
+        if (user == null)
+        {
+            fehler = "Benutzer nicht gefunden.";
+            return;
+        }
+
+        user.PasswortHash = BCrypt.Net.BCrypt.HashPassword(neuesPasswort);
+        DB.PasswortResetTokens.Remove(resetToken);
+        await DB.SaveChangesAsync();
+
+        erfolg = true;
+        await Task.Delay(2000);
+        Nav.NavigateTo("/login");
+    }
+}

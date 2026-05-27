@@ -9,12 +9,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Datenbank
-builder.Services.AddDbContext<xAzubiLogContext>(options =>
+builder.Services.AddDbContextFactory<AzubiLog_BlazorContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
+builder.Services.AddSingleton<xAzubiLog.Services.AuthService>();
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddScoped<xAzubiLog.Services.ThemeService>();
+
 
 var app = builder.Build();
 

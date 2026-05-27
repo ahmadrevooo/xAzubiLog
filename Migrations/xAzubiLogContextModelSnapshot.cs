@@ -9,8 +9,8 @@ using xAzubiLog.Data;
 
 namespace xAzubiLog.Migrations
 {
-    [DbContext(typeof(xAzubiLogContext))]
-    partial class xAzubiLogContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AzubiLog_BlazorContext))]
+    partial class AzubiLog_BlazorContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -40,7 +40,7 @@ namespace xAzubiLog.Migrations
                     b.ToTable("Ausbilder");
                 });
 
-            modelBuilder.Entity("xAzubiLog.Models.BerichtEintrag", b =>
+            modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -112,7 +112,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("WochenberichtId");
 
-                    b.ToTable("BerichtEintrag");
+                    b.ToTable("BerichtEintraege");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Kategorie", b =>
@@ -220,7 +220,7 @@ namespace xAzubiLog.Migrations
                     b.ToTable("Wochenbericht");
                 });
 
-            modelBuilder.Entity("xAzubiLog.Models.BerichtEintrag", b =>
+            modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
                 {
                     b.HasOne("xAzubiLog.Models.Ausbilder", "Ausbilder")
                         .WithMany("BerichtEintraege")
