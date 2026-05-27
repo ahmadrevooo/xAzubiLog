@@ -1,47 +1,47 @@
-﻿@page "/berichteintrags"
+﻿@page "/BerichtEintraeges"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using xAzubiLog.Models
 @using xAzubiLog.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
+@inject IDbContextFactory<xAzubiLog.Data.AzubiLog_BlazorContext> DbFactory
 
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
 
 <p>
-    <a href="berichteintrags/create">Create New</a>
+    <a href="BerichtEintraeges/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.BerichtEintrag">
-    <PropertyColumn Property="berichteintrag => berichteintrag.BenutzerId" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.AusbilderId" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.KategorieId" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.WochenberichtId" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Datum" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Tagestyp" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Auftragsnummer" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Titel" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Beschreibung" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Notiz" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Fach" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Startzeit" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Endzeit" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Dauer" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.Status" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.ErstelltAm" />
-    <PropertyColumn Property="berichteintrag => berichteintrag.GeändertAm" />
+<QuickGrid Class="table" Items="context.BerichtEintraege">
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.BenutzerId" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.AusbilderId" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.KategorieId" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.WochenberichtId" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Datum" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Tagestyp" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Auftragsnummer" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Titel" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Beschreibung" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Notiz" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Fach" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Startzeit" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Endzeit" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Dauer" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Status" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.ErstelltAm" />
+    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.GeändertAm" />
 
-    <TemplateColumn Context="berichteintrag">
-        <a href="@($"berichteintrags/edit?id={berichteintrag.Id}")">Edit</a> |
-        <a href="@($"berichteintrags/details?id={berichteintrag.Id}")">Details</a> |
-        <a href="@($"berichteintrags/delete?id={berichteintrag.Id}")">Delete</a>
+    <TemplateColumn Context="BerichtEintraege">
+        <a href="@($"BerichtEintraeges/edit?id={BerichtEintraege.Id}")">Edit</a> |
+        <a href="@($"BerichtEintraeges/details?id={BerichtEintraege.Id}")">Details</a> |
+        <a href="@($"BerichtEintraeges/delete?id={BerichtEintraege.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
-    private xAzubiLogContext context = default!;
+    private AzubiLog_BlazorContext context = default!;
 
     protected override void OnInitialized()
     {

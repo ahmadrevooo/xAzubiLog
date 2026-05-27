@@ -1,0 +1,25 @@
+﻿/* Strenge Typografie */
+.tracking-tight {
+    letter-spacing: -1px;
+}
+
+.tracking-wide {
+    letter-spacing: 1px;
+}
+
+/* Harter Primary Button ohne Weichzeichner */
+.primary-btn {
+    background-color: #0D1B2A;
+    color: #ffffff;
+    border: 1px solid #0D1B2A;
+}
+
+    .primary-btn:hover {
+        background-color: #ffffff;
+        color: #0D1B2A;
+    }
+
+/* Hover-Effekt für die Tabellenzeilen zur UX-Verstärkung */
+.table-hover tbody tr:hover td {
+    background-color: #f8f9fa;
+}

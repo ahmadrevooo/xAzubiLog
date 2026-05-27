@@ -15,13 +15,17 @@ builder.Services.AddDataProtection()
 
 // Datenbank
 builder.Services.AddDbContextFactory<xAzubiLogContext>(options =>
+builder.Services.AddDbContextFactory<AzubiLog_BlazorContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
+builder.Services.AddSingleton<xAzubiLog.Services.AuthService>();
 
 builder.Services.AddScoped<ReportBookService>();
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+
 
 var app = builder.Build();
 

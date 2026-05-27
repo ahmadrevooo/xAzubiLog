@@ -1,0 +1,73 @@
+﻿@page "/dashboard"
+
+<PageTitle>Dashboard - AzubiLog</PageTitle>
+
+<div class="container px-4 py-5" style="max-width: 850px; margin-top: 3vh;">
+
+    <!-- 1. Ruhige, professionelle Begrüßung (Klar und unaufgeregt) -->
+    <header class="mb-5">
+        <h1 class="text-white fw-normal mb-2" style="font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -1px;">
+            Willkommen zurück, Paul.
+        </h1>
+        <p style="color: #a3a3a3; font-size: 1.1rem; font-weight: 300;">
+            Hier ist dein aktueller Status.
+        </p>
+    </header>
+
+    <div class="p-4 p-md-5 mb-5 shadow-lg" style="background-color: #1a1817; border: 1px solid #362F2A; border-radius: 12px;">
+        <div class="row align-items-center">
+
+            <div class="col-md-7 mb-4 mb-md-0">
+                <span class="d-block text-uppercase mb-4" style="color: #a3a3a3; font-size: 0.75rem; letter-spacing: 2px;">Handlungsbedarf</span>
+
+                <div class="d-flex flex-column gap-3">
+                    <!-- Roter Indikator: Fehlt komplett -->
+                    <div class="d-flex align-items-center gap-3">
+                        <span style="color: #ff4d4d; font-size: 0.75rem;">●</span>
+                        <span class="text-white fw-medium">KW 17 <span style="color: #a3a3a3; font-weight: 400;">&mdash; Komplett fehlend</span></span>
+                    </div>
+
+                    <!-- Gelber Indikator: Unvollständig -->
+                    <div class="d-flex align-items-center gap-3">
+                        <span style="color: #ffc107; font-size: 0.75rem;">●</span>
+                        <span class="text-white fw-medium">KW 18 <span style="color: #a3a3a3; font-weight: 400;">&mdash; Unvollständig (Donnerstag fehlt)</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5 text-md-end">
+                <a href="weekly" class="btn d-inline-flex justify-content-center align-items-center w-100 text-uppercase" style="background-color: #ffffff; color: #151515; border-radius: 4px; padding: 1rem 1.5rem; font-weight: 600; letter-spacing: 0.5px; transition: opacity 0.2s;">
+                    Nachträge erfassen
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mt-5 pt-3">
+        <span class="d-block text-uppercase mb-4" style="color: #a3a3a3; font-size: 0.75rem; letter-spacing: 2px;">Zuletzt eingereicht</span>
+
+        <div class="d-flex justify-content-between align-items-center pb-3 mb-3" style="border-bottom: 1px solid #362F2A;">
+            <div>
+                <span class="text-white fw-medium d-block mb-1">Wochenbericht KW 16</span>
+                <span style="color: #a3a3a3; font-size: 0.85rem;">05.05.2026</span>
+            </div>
+            <span class="px-3 py-1" style="background-color: rgba(74, 222, 128, 0.05); color: #4ade80; font-size: 0.8rem; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 4px;">Genehmigt</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center pb-3" style="border-bottom: 1px solid #362F2A;">
+            <div>
+                <span class="text-white fw-medium d-block mb-1">Wochenbericht KW 15</span>
+                <span style="color: #a3a3a3; font-size: 0.85rem;">01.05.2026</span>
+            </div>
+            <span class="px-3 py-1" style="background-color: rgba(74, 222, 128, 0.05); color: #4ade80; font-size: 0.8rem; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 4px;">Genehmigt</span>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .btn:hover {
+        opacity: 0.85;
+    }
+</style>

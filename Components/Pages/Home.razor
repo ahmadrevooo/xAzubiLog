@@ -1,7 +1,344 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject xAzubiLog.Services.AuthService Auth
+@inject xAzubiLog.Data.AzubiLog_BlazorContext DB
+@inject NavigationManager Nav
+@using Microsoft.EntityFrameworkCore
+@using xAzubiLog.Models
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Dashboard – xAzubiLog</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (Auth.CurrentUser == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height:100vh; background:#0d1117;">
+        <div class="text-center text-white">
+            <h1>xAzubiLog</h1>
+            <p>Die smarte Art Berichtshefte einheitlich zu gestalten</p>
+            <a href="/login" class="btn btn-primary mt-3">Anmelden</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-box">A</div>
+                <div>
+                    <div class="logo-title">xAzubiLog</div>
+                    <div class="logo-sub">Digitale Ausbildungsnachweise</div>
+                </div>
+            </div>
+            <div class="sidebar-stats">
+                <div class="stat-label">Berichte eingereicht:</div>
+                <div class="stat-value">@anzahlBerichte</div>
+                <div class="stat-label mt-3">Nächster Meilenstein:</div>
+                <div class="stat-milestone">Noch keine Daten</div>
+            </div>
+        </div>
 
-Welcome to your new app.
+        <div class="main">
+            <div class="topbar">
+                <div class="nav-links">
+                    <a class="nav-link active" href="/">Dashboard</a>
+                    <a class="nav-link" href="/berichte/neu">Neuer Bericht</a>
+                    <a class="nav-link" href="/berichte">Verlauf</a>
+                </div>
+                <div class="user-badge">
+                    <div class="user-dot"></div>
+                    @Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname
+                </div>
+            </div>
+
+            <div class="welcome-section">
+                <div>
+                    <h2 class="welcome-title">Willkommen bei xAzubiLog, @Auth.CurrentUser.Vorname!</h2>
+                    <p class="welcome-sub">Hier ist deine Übersicht für heute.</p>
+                </div>
+                <div class="snapshot-box">
+                    <div class="snapshot-label">Snapshot</div>
+                    <div class="snapshot-value">@anzahlBerichte</div>
+                    <div class="snapshot-bar"><div class="snapshot-fill"></div></div>
+                </div>
+            </div>
+
+            <div class="cards">
+                <div class="card-item teal">
+                    <div class="card-title">Neuen Nachweis erstellen</div>
+                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/berichte/neu")'>Eintrag erstellen</button>
+                    <div class="card-icon">&#9998;</div>
+                </div>
+                <div class="card-item blue">
+                    <div class="card-title">Letzte Einträge ansehen</div>
+                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/berichte")'>Verlauf anzeigen</button>
+                    <div class="card-icon">&#128197;</div>
+                </div>
+                <div class="card-item purple">
+                    <div class="card-title">Exportieren</div>
+                    <button class="card-btn">PDF generieren</button>
+                    <div class="card-icon">&#128229;</div>
+                </div>
+            </div>
+
+            <div class="bottom-section">
+                <div class="bottom-card">
+                    <div class="bottom-title">Nächste Schritte</div>
+                    @if (letzteEintraege.Any())
+                    {
+                        @foreach (var e in letzteEintraege)
+                        {
+                            <div class="bottom-item">@e.Datum.ToString("dd.MM.yyyy") – @e.Titel</div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="bottom-item">Keine Einträge vorhanden</div>
+                    }
+                </div>
+                <div class="bottom-card">
+                    <div class="bottom-title">Unvollständige Berichte</div>
+                    @if (unvollstaendig.Any())
+                    {
+                        @foreach (var w in unvollstaendig)
+                        {
+                            <div class="bottom-item">KW @w.Kalenderwoche – @w.Status</div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="bottom-item">Alle Berichte vollständig</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .dashboard {
+        display: flex;
+        height: 100vh;
+        background: #0d1117;
+        color: white;
+        font-family: sans-serif;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: #161b22;
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        border-right: 1px solid #30363d;
+    }
+
+    .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .logo-box {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #00ff75, #3700ff);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .logo-title { font-weight: 700; font-size: 1rem; }
+    .logo-sub { font-size: 0.7rem; color: #8b949e; }
+
+    .sidebar-stats {
+        padding-top: 1rem;
+        border-top: 1px solid #30363d;
+    }
+
+    .stat-label { font-size: 0.8rem; color: #8b949e; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #00ff75; }
+    .stat-milestone { font-size: 0.85rem; color: white; margin-top: 0.25rem; }
+
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #161b22;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .nav-links { display: flex; gap: 1.5rem; }
+
+    .nav-link {
+        color: #8b949e;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .nav-link.active {
+        color: #00ff75;
+        border-bottom: 2px solid #00ff75;
+        padding-bottom: 2px;
+    }
+
+    .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        background: #21262d;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+    }
+
+    .user-dot {
+        width: 8px;
+        height: 8px;
+        background: #00ff75;
+        border-radius: 50%;
+    }
+
+    .welcome-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #161b22;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .welcome-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
+    .welcome-sub { color: #8b949e; margin: 0.25rem 0 0; font-size: 0.9rem; }
+    .snapshot-box { text-align: right; }
+    .snapshot-label { font-size: 0.8rem; color: #8b949e; }
+    .snapshot-value { font-size: 2rem; font-weight: 700; }
+
+    .snapshot-bar {
+        width: 100px;
+        height: 4px;
+        background: #30363d;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+    }
+
+    .snapshot-fill {
+        width: 60%;
+        height: 100%;
+        background: #00ff75;
+        border-radius: 2px;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .card-item {
+        border-radius: 12px;
+        padding: 1.25rem;
+        position: relative;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-item.teal { background: linear-gradient(135deg, #0d4f3c, #1a7a5e); }
+    .card-item.blue { background: linear-gradient(135deg, #0d2f4f, #1a4a7a); }
+    .card-item.purple { background: linear-gradient(135deg, #2d0d4f, #4a1a7a); }
+
+    .card-title { font-weight: 600; font-size: 1rem; }
+
+    .card-btn {
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        width: fit-content;
+        transition: background 0.2s;
+    }
+
+    .card-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .card-icon {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        opacity: 0.4;
+    }
+
+    .bottom-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .bottom-card {
+        background: #161b22;
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .bottom-title {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #8b949e;
+        font-size: 0.9rem;
+    }
+
+    .bottom-item {
+        font-size: 0.85rem;
+        color: #c9d1d9;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid #21262d;
+    }
+</style>
+
+@code {
+    int anzahlBerichte = 0;
+    List<BerichtEintraege> letzteEintraege = new();
+    List<Wochenbericht> unvollstaendig = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Auth.CurrentUser == null) return;
+
+        var userId = Auth.CurrentUser.ID;
+
+        anzahlBerichte = await DB.BerichtEintraege
+            .CountAsync(b => b.BenutzerId == userId);
+
+        letzteEintraege = await DB.BerichtEintraege
+            .Where(b => b.BenutzerId == userId)
+            .OrderByDescending(b => b.Datum)
+            .Take(4)
+            .ToListAsync();
+
+        unvollstaendig = await DB.Wochenberichte
+            .Where(w => w.BenutzerId == userId && w.Status != "Abgeschlossen")
+            .OrderByDescending(w => w.Jahr)
+            .ThenByDescending(w => w.Kalenderwoche)
+            .Take(3)
+            .ToListAsync();
+    }
+}

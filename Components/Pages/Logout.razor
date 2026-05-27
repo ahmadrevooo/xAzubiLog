@@ -1,0 +1,18 @@
+﻿@page "/logout"
+@rendermode InteractiveServer
+
+@inject xAzubiLog.Services.AuthService Auth
+@inject NavigationManager Nav
+
+<p>Du wirst abgemeldet...</p>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // ✅ User wirklich ausloggen
+        Auth.Logout();
+
+        // ✅ Redirect zum Login
+        Nav.NavigateTo("/login", true);
+    }
+}
