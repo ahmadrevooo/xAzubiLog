@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-
+@inject xAzubiLog.Services.ThemeService Theme
+@inject IJSRuntime JS
 
 <div>
     <NavMenu />
@@ -9,3 +10,15 @@
     </main>
 </div>
 
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Theme.InitializeAsync(false);
+            await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
+
+            StateHasChanged();
+        }
+    }
+}

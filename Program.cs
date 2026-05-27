@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using xAzubiLog.Data;
 using xAzubiLog.Components;
+using xAzubiLog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,18 +10,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys")));
+
 // Datenbank
+builder.Services.AddDbContextFactory<xAzubiLogContext>(options =>
 builder.Services.AddDbContextFactory<AzubiLog_BlazorContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
 builder.Services.AddSingleton<xAzubiLog.Services.AuthService>();
+
+builder.Services.AddScoped<ReportBookService>();
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<xAzubiLog.Services.EmailService>();
-
-
+builder.Services.AddScoped<xAzubiLog.Services.ThemeService>();
 
 var app = builder.Build();
 

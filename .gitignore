@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Local development artifacts
+DataProtectionKeys/
+run*.log
+*.db-shm
+*.db-wal
