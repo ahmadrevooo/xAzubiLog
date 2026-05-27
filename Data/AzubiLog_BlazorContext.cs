@@ -15,5 +15,6 @@ namespace xAzubiLog.Data
         public DbSet<BerichtEintrag> BerichtEintrag { get; set; } = default!;
         public DbSet<Kategorie> Kategorie { get; set; } = default!;
         public DbSet<Ausbilder> Ausbilder { get; set; } = default!;
+        public DbSet<xAzubiLog.Models.StundenplanEintrag> StundenplanEintrag { get; set; } = default!;
     }
 }

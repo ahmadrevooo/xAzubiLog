@@ -1,169 +1,326 @@
-﻿@page "/berichteintrags/edit"
+﻿@page "/edit/{Id:int}"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 @using Microsoft.EntityFrameworkCore
+@using System.Text.RegularExpressions
 @using xAzubiLog.Models
 @inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Eintrag bearbeiten - AzubiLog</PageTitle>
 
-<h1>Edit</h1>
+<div class="min-vh-100 py-5">
+    <div class="container px-4" style="max-width: 800px;">
 
-<h2>BerichtEintrag</h2>
-<hr />
-@if (BerichtEintrag is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="BerichtEintrag" OnValidSubmit="UpdateBerichtEintrag" FormName="edit" Enhance>
+        @if (isLoading)
+        {
+            <div class="text-center py-5 text-muted">Lade Eintrag...</div>
+        }
+        else if (BerichtEintrag == null)
+        {
+            <div class="alert alert-danger">Der angeforderte Eintrag wurde nicht gefunden.</div>
+            <a href="dashboard" class="btn-primary-custom text-decoration-none">Zurück zum Dashboard</a>
+        }
+        else
+        {
+            <EditForm Model="BerichtEintrag" OnValidSubmit="UpdateBerichtEintrag">
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
-                <input type="hidden" name="BerichtEintrag.Id" value="@BerichtEintrag.Id" />
-                <div class="mb-3">
-                    <label for="benutzerid" class="form-label">BenutzerId:</label>
-                    <InputNumber id="benutzerid" @bind-Value="BerichtEintrag.BenutzerId" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.BenutzerId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="ausbilderid" class="form-label">AusbilderId:</label>
-                    <InputNumber id="ausbilderid" @bind-Value="BerichtEintrag.AusbilderId" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.AusbilderId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="kategorieid" class="form-label">KategorieId:</label>
-                    <InputNumber id="kategorieid" @bind-Value="BerichtEintrag.KategorieId" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.KategorieId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="wochenberichtid" class="form-label">WochenberichtId:</label>
-                    <InputNumber id="wochenberichtid" @bind-Value="BerichtEintrag.WochenberichtId" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.WochenberichtId" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="datum" class="form-label">Datum:</label>
-                    <InputDate id="datum" @bind-Value="BerichtEintrag.Datum" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Datum" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="tagestyp" class="form-label">Tagestyp:</label>
-                    <InputText id="tagestyp" @bind-Value="BerichtEintrag.Tagestyp" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Tagestyp" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="auftragsnummer" class="form-label">Auftragsnummer:</label>
-                    <InputText id="auftragsnummer" @bind-Value="BerichtEintrag.Auftragsnummer" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Auftragsnummer" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="titel" class="form-label">Titel:</label>
-                    <InputText id="titel" @bind-Value="BerichtEintrag.Titel" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Titel" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="beschreibung" class="form-label">Beschreibung:</label>
-                    <InputText id="beschreibung" @bind-Value="BerichtEintrag.Beschreibung" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Beschreibung" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="notiz" class="form-label">Notiz:</label>
-                    <InputText id="notiz" @bind-Value="BerichtEintrag.Notiz" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Notiz" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="fach" class="form-label">Fach:</label>
-                    <InputText id="fach" @bind-Value="BerichtEintrag.Fach" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Fach" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="startzeit" class="form-label">Startzeit:</label>
-                    <InputDate id="startzeit" @bind-Value="BerichtEintrag.Startzeit" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Startzeit" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="endzeit" class="form-label">Endzeit:</label>
-                    <InputDate id="endzeit" @bind-Value="BerichtEintrag.Endzeit" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Endzeit" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="dauer" class="form-label">Dauer:</label>
-                    <InputNumber id="dauer" @bind-Value="BerichtEintrag.Dauer" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Dauer" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status:</label>
-                    <InputText id="status" @bind-Value="BerichtEintrag.Status" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.Status" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="erstelltam" class="form-label">ErstelltAm:</label>
-                    <InputDate id="erstelltam" @bind-Value="BerichtEintrag.ErstelltAm" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.ErstelltAm" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="geändertam" class="form-label">GeändertAm:</label>
-                    <InputDate id="geändertam" @bind-Value="BerichtEintrag.GeändertAm" class="form-control" />
-                    <ValidationMessage For="() => BerichtEintrag.GeändertAm" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </EditForm>
-        </div>
-    </div>
-}
 
-<div>
-    <a href="/berichteintrags">Back to List</a>
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="p-3 mb-4 rounded" style="background-color: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; font-size: 0.95rem; font-weight: 500;">
+                        @errorMessage
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <a href="dashboard" class="text-decoration-none d-flex align-items-center cancel-link" style="gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Abbrechen
+                    </a>
+
+                    <div class="d-flex align-items-center" style="gap: 10px;">
+                        <span style="color: #a3a3a3; font-size: 0.9rem;">Datum:</span>
+                        <InputDate @bind-Value="BerichtEintrag.Datum" @bind-Value:after="OnDateChanged" max="@DateTime.Today.ToString("yyyy-MM-dd")" class="premium-date-input" />
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <button type="button" class="status-pill @(BerichtEintrag.Tagestyp == "Betrieb" ? "active" : "")" @onclick='() => SetType("Betrieb")'>Im Betrieb</button>
+                    <button type="button" class="status-pill @(BerichtEintrag.Tagestyp == "Schule" ? "active" : "")" @onclick='() => SetType("Schule")'>Berufsschule</button>
+                    <button type="button" class="status-pill @(BerichtEintrag.Tagestyp == "Krank" ? "active" : "")" @onclick='() => SetType("Krank")'>Krank</button>
+                    <button type="button" class="status-pill @(BerichtEintrag.Tagestyp == "Urlaub" ? "active" : "")" @onclick='() => SetType("Urlaub")'>Urlaub / Feiertag</button>
+                </div>
+
+                <div class="editor-card p-4 p-md-5 mb-4">
+
+                    <div class="mb-4">
+                        <label class="d-block text-uppercase mb-2 label-style">Titel / Überschrift <span style="color: #ff4d4d;">*</span></label>
+                        <InputText @bind-Value="BerichtEintrag.Titel" class="premium-input-title" placeholder="Kurze Zusammenfassung des Tages" maxlength="100" />
+                    </div>
+
+                    @if (BerichtEintrag.Tagestyp == "Betrieb" || BerichtEintrag.Tagestyp == "Schule")
+                    {
+                        var labelText = BerichtEintrag.Tagestyp == "Betrieb" ? "Tätigkeitsbeschreibung" : "Unterrichtsinhalte";
+                        var placeholderText = BerichtEintrag.Tagestyp == "Betrieb" ? "Was hast du heute im Betrieb gemacht?" : "Inhalte der Unterrichtsfächer...";
+
+                        <label class="d-block text-uppercase mb-3 label-style">@labelText <span style="color: #ff4d4d;">*</span></label>
+
+                        <textarea @bind="BerichtEintrag.Beschreibung"
+                                  @bind:event="oninput"
+                                  class="premium-textarea" rows="10"
+                                  placeholder="@placeholderText" maxlength="1000"></textarea>
+
+                        <div class="d-flex justify-content-between mt-2" style="font-size: 0.75rem;">
+                            @{
+                                var currentLength = BerichtEintrag.Beschreibung?.Length ?? 0;
+                            }
+                            <div style="color: @(currentLength < 50 ? "#ff4d4d" : "#555")">
+                                @(currentLength < 50 ? $"Noch {50 - currentLength} Zeichen bis zum Minimum" : "Mindestlänge erreicht")
+                            </div>
+                            <div style="color: @(currentLength > 950 ? "#ff4d4d" : "#555")">
+                                @currentLength / 1000 Zeichen
+                            </div>
+                        </div>
+
+                        @if (BerichtEintrag.Tagestyp == "Schule")
+                        {
+                            <div class="text-end mt-4">
+                                @* Übergibt den Kontext 'edit' und die ID dieses spezifischen Berichts *@
+                                <a href="@($"settings?returnTo=edit&entryId={Id}")" class="text-decoration-none hover-white" style="color: #a3a3a3; font-size: 0.85rem; border: 1px solid #362F2A; padding: 6px 14px; border-radius: 20px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Stundenplan hinterlegen
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <p style="color: #a3a3a3;">Für diesen Status ist keine Beschreibung erforderlich.</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center mt-4">
+                    @{
+                        bool requiresText = BerichtEintrag.Tagestyp == "Betrieb" || BerichtEintrag.Tagestyp == "Schule";
+                        int textLen = BerichtEintrag.Beschreibung?.Length ?? 0;
+                        bool isDisabled = requiresText && textLen < 50;
+                    }
+                    <button type="submit" class="btn-primary-custom" disabled="@isDisabled">
+                        Änderungen speichern
+                    </button>
+                </div>
+            </EditForm>
+        }
+    </div>
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    private int Id { get; set; }
+    [Parameter]
+    public int Id { get; set; }
 
-    [SupplyParameterFromForm]
     private BerichtEintrag? BerichtEintrag { get; set; }
+    private string errorMessage = "";
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        BerichtEintrag ??= await context.BerichtEintrag.FirstOrDefaultAsync(m => m.Id == Id);
-
-        if (BerichtEintrag is null)
+        try
         {
-            NavigationManager.NotFound();
+            using var context = DbFactory.CreateDbContext();
+            BerichtEintrag = await context.BerichtEintrag.FirstOrDefaultAsync(e => e.Id == Id);
+
+            // Falls der User aus den Settings zurückkommt, laden wir den aktualisierten Plan nach,
+            // aber nur, wenn das Feld leer oder der Standard-Strich ist.
+            if (BerichtEintrag != null && BerichtEintrag.Tagestyp == "Schule" &&
+               (string.IsNullOrWhiteSpace(BerichtEintrag.Beschreibung) || BerichtEintrag.Beschreibung == "-"))
+            {
+                await LadeStundenplanVorlagen();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Fehler beim Laden der Daten.";
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task OnDateChanged()
+    {
+        if (BerichtEintrag?.Tagestyp == "Schule") await LadeStundenplanVorlagen();
+        StateHasChanged();
+    }
+
+    private async Task SetType(string type)
+    {
+        if (BerichtEintrag == null) return;
+
+        BerichtEintrag.Tagestyp = type;
+        errorMessage = "";
+
+        if (type == "Schule")
+        {
+            await LadeStundenplanVorlagen();
+        }
+        else if (type == "Krank" || type == "Urlaub")
+        {
+            BerichtEintrag.Titel = type;
+            BerichtEintrag.Beschreibung = "-";
+        }
+        else
+        {
+            BerichtEintrag.Titel = "";
+            BerichtEintrag.Beschreibung = "";
+        }
+        StateHasChanged();
+    }
+
+    private async Task LadeStundenplanVorlagen()
+    {
+        if (BerichtEintrag == null) return;
+
+        int wochentagIndex = ((int)BerichtEintrag.Datum.DayOfWeek + 6) % 7;
+        using var context = DbFactory.CreateDbContext();
+        var vorlagen = await context.StundenplanEintrag
+            .Where(e => e.BenutzerId == 1 && e.Wochentag == wochentagIndex)
+            .ToListAsync();
+
+        if (vorlagen.Any())
+        {
+            var vorschlag = string.Join("\n\n", vorlagen.Select(f => $"{f.FachName}:\n- "));
+            if (string.IsNullOrWhiteSpace(BerichtEintrag.Beschreibung) || BerichtEintrag.Beschreibung == "-")
+            {
+                BerichtEintrag.Beschreibung = vorschlag;
+                BerichtEintrag.Titel = $"Berufsschule ({BerichtEintrag.Datum.ToString("dd.MM.yyyy")})";
+            }
+        }
+    }
+
     private async Task UpdateBerichtEintrag()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(BerichtEintrag!).State = EntityState.Modified;
+        if (BerichtEintrag == null) return;
 
         try
         {
+            BerichtEintrag.GeändertAm = DateTime.Now;
+
+            if (BerichtEintrag.Status == "Genehmigt")
+            {
+                BerichtEintrag.Status = "Entwurf";
+            }
+
+            using var context = DbFactory.CreateDbContext();
+            context.BerichtEintrag.Update(BerichtEintrag);
             await context.SaveChangesAsync();
+
+            NavigationManager.NavigateTo("/dashboard");
         }
-        catch (DbUpdateConcurrencyException)
+        catch (Exception ex)
         {
-            if (!BerichtEintragExists(BerichtEintrag!.Id))
-            {
-                NavigationManager.NotFound();
-            }
-            else
-            {
-                throw;
-            }
+            errorMessage = $"Datenbank-Fehler beim Aktualisieren: {ex.Message}";
         }
-
-        NavigationManager.NavigateTo("/berichteintrags");
-    }
-
-    private bool BerichtEintragExists(int id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.BerichtEintrag.Any(e => e.Id == id);
     }
 }
+
+<style>
+    .cancel-link {
+        color: #d1d1d1;
+        transition: color 0.2s;
+        font-weight: 500;
+    }
+
+        .cancel-link:hover {
+            color: #ffffff;
+        }
+
+    .hover-white {
+        transition: color 0.2s, border-color 0.2s;
+    }
+
+        .hover-white:hover {
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+
+    .label-style {
+        color: #a3a3a3;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .premium-date-input {
+        background: transparent;
+        border: 1px solid #362F2A;
+        color: #ffffff;
+        padding: 4px 10px;
+        border-radius: 4px;
+        color-scheme: dark;
+    }
+
+    .status-pill {
+        background: none;
+        color: #a3a3a3;
+        border: 1px solid #362F2A;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .status-pill.active {
+            background-color: #362F2A;
+            color: #ffffff;
+            border-color: #362F2A;
+        }
+
+    .editor-card {
+        background-color: rgba(26, 24, 23, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid #362F2A;
+        border-radius: 12px;
+    }
+
+    .premium-input-title {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #362F2A;
+        color: #ffffff;
+        font-size: 1.2rem;
+        padding: 5px 0;
+        outline: none;
+    }
+
+    .premium-textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 1rem;
+        line-height: 1.6;
+        resize: none;
+        outline: none;
+    }
+
+    .btn-primary-custom {
+        background-color: #ffffff;
+        color: #151515;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 24px;
+        font-weight: 600;
+        transition: opacity 0.2s;
+    }
+
+        .btn-primary-custom:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+</style>

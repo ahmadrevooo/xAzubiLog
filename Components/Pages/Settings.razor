@@ -1,0 +1,157 @@
+﻿@page "/settings"
+@rendermode InteractiveServer
+
+@using xAzubiLog.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
+
+<div class="container py-5" style="max-width: 800px;">
+
+    @* Die intelligente Navigation: Erkennt, woher der User kam *@
+    <div class="mb-5">
+        @if (returnTo == "create")
+        {
+            <a href="/create?tab=Schule" class="text-decoration-none d-flex align-items-center cancel-link" style="gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Zurück zum neuen Eintrag
+            </a>
+        }
+        else if (returnTo == "edit" && entryId.HasValue)
+        {
+            <a href="/edit/@entryId" class="text-decoration-none d-flex align-items-center cancel-link" style="gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Zurück zur Bearbeitung
+            </a>
+        }
+        else
+        {
+            <a href="/dashboard" class="text-decoration-none d-flex align-items-center cancel-link" style="gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Zurück zur Übersicht
+            </a>
+        }
+    </div>
+
+    <h2 class="mb-5 text-white fw-light">Persönlicher Stundenplan</h2>
+
+    <div class="editor-card p-4 p-md-5">
+        <p class="text-muted small mb-4">Hinterlege hier deine Fächer. Diese werden beim Erstellen eines Berichts (Status Schule) automatisch geladen.</p>
+
+        @for (int i = 0; i < 5; i++)
+        {
+            var tagIndex = i;
+            var tagesName = GetWochentagName(tagIndex);
+
+            <div class="mb-5">
+                <h5 class="text-uppercase label-style mb-3">@tagesName</h5>
+
+                @foreach (var eintrag in AlleEintraege.Where(e => e.Wochentag == tagIndex))
+                {
+                    <div class="d-flex gap-2 mb-2">
+                        <div class="flex-grow-1 p-2 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #362F2A;">
+                            @eintrag.FachName
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => LoescheEintrag(eintrag)">×</button>
+                    </div>
+                }
+
+                <div class="d-flex gap-2 mt-2">
+                    <input type="text" class="premium-input-title fs-6 py-1" @bind="neueFaecher[tagIndex]" placeholder="Neues Fach..." />
+                    <button class="btn btn-sm btn-outline-light" @onclick="() => FuegeFachHinzu(tagIndex)">Hinzufügen</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    // Parameter fangen die Werte aus der URL ab
+    [SupplyParameterFromQuery]
+    public string? returnTo { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? entryId { get; set; }
+
+    private List<StundenplanEintrag> AlleEintraege = new();
+    private string[] neueFaecher = new string[5];
+    private int dummyIdCounter = 1000;
+
+    protected override async Task OnInitializedAsync() => await LadeDaten();
+
+    private async Task LadeDaten()
+    {
+        // === FRONTEND-DUMMY-MODUS ===
+        // using var context = DbFactory.CreateDbContext();
+        // AlleEintraege = await context.StundenplanEintrag.Where(e => e.BenutzerId == 1).ToListAsync();
+
+        await Task.Delay(100);
+        if (!AlleEintraege.Any())
+        {
+            // Start-Daten für das Frontend, solange die DB aus ist
+            AlleEintraege.Add(new StundenplanEintrag { Id = 1, BenutzerId = 1, Wochentag = 0, FachName = "Anwendungsentwicklung" });
+            AlleEintraege.Add(new StundenplanEintrag { Id = 2, BenutzerId = 1, Wochentag = 0, FachName = "IT-Systeme" });
+        }
+    }
+
+    private async Task FuegeFachHinzu(int tag)
+    {
+        if (string.IsNullOrWhiteSpace(neueFaecher[tag])) return;
+
+        var neu = new StundenplanEintrag { Id = dummyIdCounter++, BenutzerId = 1, Wochentag = tag, FachName = neueFaecher[tag] };
+
+        // === FRONTEND-DUMMY-MODUS ===
+        // using var context = DbFactory.CreateDbContext();
+        // context.StundenplanEintrag.Add(neu);
+        // await context.SaveChangesAsync();
+        AlleEintraege.Add(neu);
+
+        neueFaecher[tag] = "";
+    }
+
+    private async Task LoescheEintrag(StundenplanEintrag e)
+    {
+        // === FRONTEND-DUMMY-MODUS ===
+        // using var context = DbFactory.CreateDbContext();
+        // context.StundenplanEintrag.Remove(e);
+        // await context.SaveChangesAsync();
+        AlleEintraege.Remove(e);
+    }
+
+    private string GetWochentagName(int i) => i switch { 0 => "Montag", 1 => "Dienstag", 2 => "Mittwoch", 3 => "Donnerstag", _ => "Freitag" };
+}
+
+<style>
+    .cancel-link {
+        color: #d1d1d1;
+        transition: color 0.2s;
+        font-weight: 500;
+    }
+
+        .cancel-link:hover {
+            color: #ffffff;
+        }
+
+    .label-style {
+        color: #a3a3a3;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .editor-card {
+        background-color: rgba(26, 24, 23, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid #362F2A;
+        border-radius: 12px;
+    }
+
+    .premium-input-title {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #362F2A;
+        color: #ffffff;
+        font-size: 1.2rem;
+        padding: 5px 0;
+        outline: none;
+    }
+</style>

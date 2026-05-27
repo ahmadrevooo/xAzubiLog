@@ -8,12 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Datenbank
-builder.Services.AddDbContext<xAzubiLogContext>(options =>
+// NUR NOCH DIE FACTORY: Keine Konflikte mehr zwischen Scoped und Singleton
+builder.Services.AddDbContextFactory<xAzubiLogContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
@@ -30,6 +29,7 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 app.UseAntiforgery();
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

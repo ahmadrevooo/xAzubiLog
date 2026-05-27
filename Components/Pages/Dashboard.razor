@@ -1,16 +1,19 @@
 ﻿@page "/dashboard"
+@rendermode InteractiveServer
+
+@using Microsoft.EntityFrameworkCore
+@using xAzubiLog.Models
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
 
 <PageTitle>Übersicht - xAzubiLog</PageTitle>
 
 <div class="container px-4 py-5 mt-3" style="max-width: 900px;">
 
-    <!-- 1. Ruhige, professionelle Begrüßung (Klar und unaufgeregt) -->
     <header class="mb-5">
         <h1 class="fw-bold mb-2 text-white" style="font-size: 2.5rem; letter-spacing: -1px;">Guten Tag, Paul.</h1>
         <p class="fs-5" style="color: #a3a3a3;">Hier ist die Übersicht deiner Ausbildungsnachweise.</p>
     </header>
 
-    <!-- 2. Sachlicher Aufgaben-Block (massiv, erdig, ohne harten Rand) -->
     <div class="p-4 p-md-5 mb-5 rounded-3" style="background-color: #362F2A;">
         <div class="row align-items-center">
 
@@ -18,13 +21,11 @@
                 <h6 class="text-uppercase mb-4" style="color: #a3a3a3; font-size: 0.8rem; letter-spacing: 2px;">Aktuelle Aufgaben</h6>
 
                 <div class="d-flex flex-column gap-3">
-                    <!-- Roter Indikator: Fehlt komplett -->
                     <div class="d-flex align-items-center gap-3">
                         <span style="color: #ff4d4d; font-size: 0.75rem;">●</span>
                         <span class="text-white fw-medium">KW 17 <span style="color: #a3a3a3; font-weight: normal;">&mdash; Komplett fehlend</span></span>
                     </div>
 
-                    <!-- Gelber Indikator: Unvollständig -->
                     <div class="d-flex align-items-center gap-3">
                         <span style="color: #ffc107; font-size: 0.75rem;">●</span>
                         <span class="text-white fw-medium">KW 18 <span style="color: #a3a3a3; font-weight: normal;">&mdash; Unvollständig (Donnerstag fehlt)</span></span>
@@ -41,25 +42,85 @@
         </div>
     </div>
 
-    <!-- 3. Letzte Aktivitäten (Subtile Trennlinien im passenden Erdton) -->
     <div class="mt-5">
-        <h6 class="text-uppercase mb-4" style="color: #a3a3a3; font-size: 0.8rem; letter-spacing: 2px;">Zuletzt eingereicht</h6>
-
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="border-color: #362F2A !important;">
-            <div>
-                <span class="text-white fw-medium d-block">Wochenbericht KW 16</span>
-                <span class="small" style="color: #a3a3a3;">Dienstag, 05.05.2026</span>
-            </div>
-            <span class="badge rounded-0 px-2 py-1 fw-normal" style="background-color: #151515; color: #a3a3a3; border: 1px solid #362F2A;">Genehmigt</span>
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h6 class="text-uppercase mb-0" style="color: #a3a3a3; font-size: 0.8rem; letter-spacing: 2px;">Letzte Tagesberichte</h6>
+            <a href="create" class="text-decoration-none" style="color: #ffffff; font-size: 0.85rem; border-bottom: 1px solid #362F2A; padding-bottom: 2px;">+ Neuen Eintrag erstellen</a>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-3" style="border-color: #362F2A !important;">
-            <div>
-                <span class="text-white fw-medium d-block">Wochenbericht KW 15</span>
-                <span class="small" style="color: #a3a3a3;">Freitag, 01.05.2026</span>
+        @if (LetzteEintraege == null)
+        {
+            <div class="text-center py-4" style="color: #a3a3a3;">Lade Einträge...</div>
+        }
+        else if (!LetzteEintraege.Any())
+        {
+            <div class="text-center py-4 border-bottom" style="border-color: #362F2A !important;">
+                <span style="color: #a3a3a3;">Du hast noch keine Berichte erstellt.</span>
             </div>
-            <span class="badge rounded-0 px-2 py-1 fw-normal" style="background-color: #151515; color: #a3a3a3; border: 1px solid #362F2A;">Genehmigt</span>
-        </div>
+        }
+        else
+        {
+            @foreach (var eintrag in LetzteEintraege)
+            {
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="border-color: #362F2A !important;">
+                    <div class="d-flex flex-column">
+                        <span class="text-white fw-medium">
+                            @eintrag.Titel
+                            <span class="ms-2 badge rounded-0 px-2 py-1 fw-normal" style="background-color: transparent; color: #a3a3a3; border: 1px solid #362F2A; font-size: 0.7rem;">@eintrag.Tagestyp</span>
+                        </span>
+                        <span class="small mt-1" style="color: #a3a3a3;">
+                            @eintrag.Datum.ToString("dddd, dd.MM.yyyy") &mdash; <span style="color: @GetStatusColor(eintrag.Status)">@eintrag.Status</span>
+                        </span>
+                    </div>
+
+                    @* Der entscheidende Weg in die Edit.razor *@
+                    <a href="edit/@eintrag.Id" class="edit-link text-decoration-none px-3 py-2 rounded">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <span class="ms-1 small fw-medium">Bearbeiten</span>
+                    </a>
+                </div>
+            }
+        }
     </div>
-
 </div>
+
+@code {
+    private List<BerichtEintrag>? LetzteEintraege;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Wir holen die echten Daten aus der Datenbank (die letzten 5 Einträge)
+        using var context = DbFactory.CreateDbContext();
+        LetzteEintraege = await context.BerichtEintrag
+            .Where(e => e.BenutzerId == 1) // Wieder hartcodiert für den Prototyp, bis der Login steht
+            .OrderByDescending(e => e.Datum)
+            .Take(5)
+            .ToListAsync();
+    }
+
+    // Kleine UX-Hilfe: Farben basierend auf dem Status
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "Entwurf" => "#ffc107",
+            "Abgeschlossen" => "#a3a3a3",
+            "Genehmigt" => "#198754", // Ein sattes Grün, falls vom Ausbilder abgesegnet
+            _ => "#a3a3a3"
+        };
+    }
+}
+
+<style>
+    .edit-link {
+        color: #a3a3a3;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid transparent;
+    }
+
+        .edit-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid #362F2A;
+        }
+</style>
