@@ -1,12 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* RESET */
-html, body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
+body.theme-dark {
+    background-color: #211e1d;
+    color: #ffffff;
+}
+
+body.theme-light {
+    background-color: #f6f8fa;
+    color: #1f2328;
+}
+
+/* DARK MODE */
+body.theme-dark {
     background-color: #0d1117;
     color: #ffffff;
+}
+
+/* LIGHT MODE */
+body.theme-light {
+    background-color: #f6f8fa;
+    color: #1f2328;
 }
 
 /* LINKS */
@@ -15,14 +28,27 @@ a {
     text-decoration: none;
 }
 
-/* NAV */
-nav {
-    background-color: transparent;
-    color: inherit;
-}
-
 /* CARDS */
-.card {
+.theme-dark .card {
     background: #161b22;
     color: white;
+}
+
+.theme-light .card {
+    background: white;
+    color: #1f2328;
+}
+
+.theme-light nav {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.theme-dark nav {
+    background-color: transparent;
+}
+
+
+nav {
+    color: inherit !important;
 }
