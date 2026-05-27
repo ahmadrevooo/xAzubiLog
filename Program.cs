@@ -17,6 +17,8 @@ builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+builder.Services.AddScoped<xAzubiLog.Services.EmailService>();
+
 
 
 var app = builder.Build();
