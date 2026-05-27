@@ -1,0 +1,118 @@
+.report-book-module {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1rem 0 2rem;
+    color: #111827;
+}
+
+.module-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+}
+
+.module-eyebrow {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.75rem;
+    line-height: 1.15;
+}
+
+.module-header p {
+    margin: 0.45rem 0 0;
+    color: #64748b;
+}
+
+.module-meta {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 13rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #dbe3ea;
+    border-radius: 8px;
+    background: #f8fafc;
+    text-align: right;
+}
+
+.module-meta span {
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.module-meta strong {
+    color: #111827;
+}
+
+.status-alert {
+    margin: 0;
+    border-radius: 8px;
+    color: #334155;
+}
+
+.report-layout {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.18fr) minmax(320px, 0.82fr);
+    gap: 1.25rem;
+    align-items: stretch;
+}
+
+.module-card {
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+}
+
+.overview-card {
+    min-height: 32rem;
+}
+
+.week-section {
+    padding: 1.1rem;
+}
+
+@media (max-width: 1180px) {
+    .report-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-card {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .module-header {
+        display: grid;
+        align-items: start;
+    }
+
+    .module-meta {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .module-card,
+    .module-header {
+        padding: 1rem;
+    }
+}

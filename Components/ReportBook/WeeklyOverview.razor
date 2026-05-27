@@ -1,0 +1,52 @@
+@page "/Wochenübersicht"
+@using System.Globalization
+@using xAzubiLog.Models
+@using xAzubiLog.Services
+
+<section class="weekly-card">
+    <header class="weekly-header">
+        <div>
+            <span class="module-eyebrow">Wochenübersicht</span>
+            <h2>Kalenderwoche @CalendarWeek</h2>
+        </div>
+        <strong>@WeeklyTotal.ToString("0.##") h</strong>
+    </header>
+
+    <div class="week-grid">
+        @foreach (var day in Days)
+        {
+            var dayEntries = GetEntriesForDay(day);
+            var dayTotal = dayEntries.Sum(entry => ReportBookService.CalculateDuration(entry.Startzeit, entry.Endzeit));
+
+            <button type="button"
+                    class="week-day @(day.Date == SelectedDate.Date ? "active" : null)"
+                    @onclick="() => OnDateSelected.InvokeAsync(day)">
+                <span>@day.ToString("ddd", GermanCulture)</span>
+                <strong>@day.ToString("dd.MM.", GermanCulture)</strong>
+                <small>@dayEntries.Count Einträge</small>
+                <b>@dayTotal.ToString("0.##") h</b>
+            </button>
+        }
+    </div>
+</section>
+
+@code {
+    private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
+
+    [Parameter] public DateTime SelectedDate { get; set; }
+    [Parameter] public IReadOnlyList<BerichtEintrag> Entries { get; set; } = [];
+    [Parameter] public EventCallback<DateTime> OnDateSelected { get; set; }
+
+    private DateTime WeekStart => ReportBookService.GetStartOfWeek(SelectedDate);
+    private IEnumerable<DateTime> Days => Enumerable.Range(0, 5).Select(offset => WeekStart.AddDays(offset));
+    private decimal WeeklyTotal => Entries.Sum(entry => ReportBookService.CalculateDuration(entry.Startzeit, entry.Endzeit));
+    private int CalendarWeek => GermanCulture.Calendar.GetWeekOfYear(SelectedDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+
+    /// <summary>
+    /// Filters weekly entries for one displayed weekday.
+    /// </summary>
+    private IReadOnlyList<BerichtEintrag> GetEntriesForDay(DateTime day)
+    {
+        return Entries.Where(entry => entry.Datum.Date == day.Date).ToList();
+    }
+}

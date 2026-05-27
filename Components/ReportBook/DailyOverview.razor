@@ -1,0 +1,70 @@
+@using System.Globalization
+@using xAzubiLog.Models
+@using xAzubiLog.Services
+
+<section class="daily-card">
+    <header class="overview-header">
+        <div>
+            <span class="module-eyebrow">Tagesübersicht</span>
+            <h2>@SelectedDate.ToString("dddd, dd. MMMM yyyy", GermanCulture)</h2>
+        </div>
+        <span class="entry-badge">@Entries.Count</span>
+    </header>
+
+    <div class="entry-list">
+        @if (Entries.Count == 0)
+        {
+            <div class="empty-state">
+                <strong>Keine Einträge vorhanden</strong>
+                <span>Für dieses Datum wurden noch keine Arbeiten erfasst.</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var entry in Entries)
+            {
+                <button type="button"
+                        class="entry-item @(entry.Id == SelectedEntryId ? "selected" : null)"
+                        @onclick="() => OnEntrySelected.InvokeAsync(entry.Id)">
+                    <span class="time-range">@entry.Startzeit.ToString("HH:mm") - @entry.Endzeit.ToString("HH:mm")</span>
+                    <span class="duration">@ReportBookService.CalculateDuration(entry.Startzeit, entry.Endzeit).ToString("0.##") h</span>
+                    <strong>@entry.Titel</strong>
+                    <span class="category" style="--category-color:@(entry.Kategorie?.FarbeHex ?? "#64748b")">
+                        @(entry.Kategorie?.Name ?? "Ohne Kategorie")
+                    </span>
+                    <p>@CreatePreview(entry.Beschreibung)</p>
+                </button>
+            }
+        }
+    </div>
+
+    <footer class="summary-footer">
+        <span>Gesamte Arbeitszeit</span>
+        <strong>@TotalHours.ToString("0.##") h</strong>
+    </footer>
+</section>
+
+@code {
+    private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
+
+    [Parameter] public DateTime SelectedDate { get; set; }
+    [Parameter] public IReadOnlyList<BerichtEintrag> Entries { get; set; } = [];
+    [Parameter] public int? SelectedEntryId { get; set; }
+    [Parameter] public EventCallback<int> OnEntrySelected { get; set; }
+
+    private decimal TotalHours => Entries.Sum(entry => ReportBookService.CalculateDuration(entry.Startzeit, entry.Endzeit));
+
+    /// <summary>
+    /// Creates a short text preview for compact entry cards.
+    /// </summary>
+    private static string CreatePreview(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "Keine Beschreibung hinterlegt.";
+        }
+
+        var text = value.Trim();
+        return text.Length <= 96 ? text : $"{text[..93]}...";
+    }
+}
