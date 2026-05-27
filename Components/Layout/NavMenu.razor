@@ -3,79 +3,40 @@
 @inject xAzubiLog.Services.ThemeService Theme
 @inject IJSRuntime JS
 
-<nav class="py-4 px-4 px-md-5" style="background-color: transparent;">
-    <div class="d-flex justify-content-between align-items-center w-100">
-
-        <!-- LOGO -->
-        <a class="d-flex align-items-center text-white text-decoration-none" href="">
-            <span class="fw-medium" style="font-size: 1.2rem;">AzubiLog</span>
-        </a>
-
-        <!-- NAV -->
-        <div class="d-none d-lg-flex align-items-center justify-content-center">
-            <div style="display: flex; gap: 3rem;">
-                <a href="BerichtEintraeges/create" class="sqs-nav-link">Einträge</a>
-                <a href="weekly" class="sqs-nav-link">Wochenbericht</a>
-                <a href="create" class="sqs-nav-link">Eintrag erstellen</a>
-            </div>
+<nav class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <a class="logo" href="/">AzubiLog</a>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tagesberichte">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tagesberichte
-            </NavLink>
+
+        <div class="nav-links">
+            <!--
+            <NavLink class="nav-link" href="tagesberichte">Tagesberichte</NavLink>
+            <NavLink class="nav-link" href="Wochenübersicht">Wochenübersicht</NavLink>
+            -->
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Wochenübersicht">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Wochenübersicht
-            </NavLink>
-        </div>
-    </nav>
-</div>
 
-        <!-- RIGHT SIDE -->
-        <div class="d-none d-lg-flex align-items-center gap-3">
-
-            <!-- THEME TOGGLE -->
-            <div class="d-flex align-items-center gap-2">
-                <span style="font-size: 0.8rem; opacity: 0.7;">
-                    @(Theme.IsDark ? "Dark" : "Light")
-                </span>
-
+        <div class="actions">
+            <div class="theme-toggle">
+                <!-- <span class="theme-label">@(Theme.IsDark ? "Dark" : "Light")</span> 
                 <label class="ui-switch">
-                    <input type="checkbox"
-                           checked="@(!Theme.IsDark)"
-                           @onchange="async e => await ToggleTheme()" />
-                    <div class="slider">
-                        <div class="circle"></div>
-                    </div>
-                </label>
+                    <input type="checkbox" checked="@(!Theme.IsDark)" @onchange="async e => await ToggleTheme()" />
+                    <div class="slider"><div class="circle"></div></div>
+                </label>-->
             </div>
 
-            <!-- USER -->
             @if (Auth.IsAuthenticated && Auth.CurrentUser != null)
             {
-                <div class="profile-menu">
-                    <div class="profile-avatar">
-                        @Auth.CurrentUser.Vorname[0]@Auth.CurrentUser.Nachname[0]
-                    </div>
-                    <div class="profile-dropdown">
-                        <div class="profile-name">
-                            @Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname
-                        </div>
-                        <div class="profile-role">
-                            @Auth.CurrentUser.Rolle
-                        </div>
-                        <hr />
-                        <a href="/logout" class="profile-logout">Abmelden</a>
-                    </div>
+                <div class="profile">
+                    <div class="avatar">@Auth.CurrentUser.Vorname[0]@Auth.CurrentUser.Nachname[0]</div>
+                    <div class="profile-name">@Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname</div>
                 </div>
             }
             else
             {
-                <a href="/login" class="login-link">Anmelden</a>
+                <a class="login-link" href="/login">Anmelden</a>
             }
         </div>
-
     </div>
 </nav>
 
@@ -263,6 +224,36 @@
         height: 0;
     }
 
+    .actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ff75, #3700ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+}
+
+.topbar-inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
 </style>
 
 @code {
@@ -270,9 +261,6 @@
     async Task ToggleTheme()
     {
         Theme.Toggle();
-
-        Console.WriteLine("Toggle pressed: " + Theme.IsDark);
-
         await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
     }
 }

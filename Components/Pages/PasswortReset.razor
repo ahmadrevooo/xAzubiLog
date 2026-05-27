@@ -5,7 +5,7 @@
 @using xAzubiLog.Models
 @using Microsoft.EntityFrameworkCore
 
-@inject AzubiLog_BlazorContext DB
+@inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
 
 <PageTitle>Passwort zurücksetzen – xAzubiLog</PageTitle>
@@ -190,7 +190,7 @@
             return;
         }
 
-        var user = await DB.Users.FirstOrDefaultAsync(u => u.ID == resetToken.UserId);
+        var user = await DB.User.FirstOrDefaultAsync(u => u.ID == resetToken.UserId);
         if (user == null)
         {
             fehler = "Benutzer nicht gefunden.";

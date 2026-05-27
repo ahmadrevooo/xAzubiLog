@@ -1,8 +1,6 @@
 ﻿window.myTheme = {
     setTheme: function (isDark) {
 
-        console.log("SWITCH:", isDark);
-
         document.body.classList.remove("theme-dark", "theme-light");
 
         if (isDark) {
@@ -12,5 +10,11 @@
         }
 
         localStorage.setItem("theme", isDark ? "dark" : "light");
+    },
+    getStoredTheme: function () {
+        return localStorage.getItem("theme");
     }
 };
+
+// expose friendly method used by server-side code
+window.setTheme = function(isDark) { window.myTheme.setTheme(isDark); };

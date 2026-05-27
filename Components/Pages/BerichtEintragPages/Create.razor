@@ -1,7 +1,7 @@
 ﻿@page "/BerichtEintraeges/create"
 @using Microsoft.EntityFrameworkCore
 @using xAzubiLog.Models
-@inject IDbContextFactory<xAzubiLog.Data.AzubiLog_BlazorContext> DbFactory
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
@@ -111,7 +111,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private BerichtEintraege BerichtEintraege { get; set; } = default!;
+    private BerichtEintrag BerichtEintraege { get; set; } = default!;
 
     protected override void OnInitialized() => BerichtEintraege ??= new();
 
@@ -119,7 +119,7 @@
     private async Task AddBerichtEintraege()
     {
         using var context = DbFactory.CreateDbContext();
-        context.BerichtEintraege.Add(BerichtEintraege);
+        context.BerichtEintrag.Add(BerichtEintraege);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/BerichtEintraeges");
     }

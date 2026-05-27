@@ -9,8 +9,8 @@ using xAzubiLog.Data;
 
 namespace xAzubiLog.Migrations
 {
-    [DbContext(typeof(AzubiLog_BlazorContext))]
-    partial class AzubiLog_BlazorContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(xAzubiLog.Data.xAzubiLogContext))]
+    partial class xAzubiLogContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

@@ -1,7 +1,7 @@
 ﻿@page "/konto"
 @rendermode InteractiveServer
 @inject xAzubiLog.Services.AuthService Auth
-@inject xAzubiLog.Data.AzubiLog_BlazorContext DB
+@inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
 @using Microsoft.EntityFrameworkCore
 @using xAzubiLog.Models
@@ -363,7 +363,7 @@
             return;
         }
 
-        var user = await DB.Users.FindAsync(Auth.CurrentUser.ID);
+        var user = await DB.User.FindAsync(Auth.CurrentUser.ID);
         if (user == null)
         {
             speichernLaeuft = false;
@@ -427,7 +427,7 @@
             return;
         }
 
-        var user = await DB.Users.FindAsync(Auth.CurrentUser.ID);
+        var user = await DB.User.FindAsync(Auth.CurrentUser.ID);
         if (user == null)
         {
             speichernPasswort = false;

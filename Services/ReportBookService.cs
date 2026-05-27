@@ -11,7 +11,7 @@ namespace xAzubiLog.Services;
 public sealed class ReportBookService
 {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
-    private static readonly string[] DefaultCategories = ["Intern", "Extern", "Entwicklung", "Support", "Meeting", "Dokumentation"];
+    private static readonly string[] DefaultCategories = new[] { "Intern", "Extern", "Entwicklung", "Support", "Meeting", "Dokumentation" };
     private readonly IDbContextFactory<xAzubiLogContext> dbFactory;
 
     /// <summary>

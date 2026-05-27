@@ -10,7 +10,7 @@ using xAzubiLog.Data;
 
 namespace xAzubiLog.Migrations
 {
-    [DbContext(typeof(AzubiLog_BlazorContext))]
+    [DbContext(typeof(xAzubiLog.Data.xAzubiLogContext))]
     [Migration("20260430095701_InitialCreate")]
     partial class InitialCreate
     {

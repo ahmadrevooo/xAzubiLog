@@ -7,6 +7,6 @@
         public string Email { get; set; } = "";
         public string Abteilung { get; set; } = "";
 
-        public List<BerichtEintraege> BerichtEintraege { get; set; } = new();
+        public List<BerichtEintrag> BerichtEintraege { get; set; } = new();
     }
 }

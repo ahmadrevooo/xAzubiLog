@@ -4,7 +4,7 @@
 @using xAzubiLog.Models
 @using xAzubiLog.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<xAzubiLog.Data.AzubiLog_BlazorContext> DbFactory
+@inject IDbContextFactory<xAzubiLog.Data.xAzubiLogContext> DbFactory
 
 <PageTitle>Index</PageTitle>
 
@@ -14,34 +14,34 @@
     <a href="BerichtEintraeges/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.BerichtEintraege">
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.BenutzerId" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.AusbilderId" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.KategorieId" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.WochenberichtId" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Datum" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Tagestyp" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Auftragsnummer" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Titel" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Beschreibung" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Notiz" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Fach" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Startzeit" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Endzeit" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Dauer" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.Status" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.ErstelltAm" />
-    <PropertyColumn Property="BerichtEintraege => BerichtEintraege.GeändertAm" />
+<QuickGrid Class="table" Items="context.BerichtEintrag">
+    <PropertyColumn Property="entry => entry.BenutzerId" />
+    <PropertyColumn Property="entry => entry.AusbilderId" />
+    <PropertyColumn Property="entry => entry.KategorieId" />
+    <PropertyColumn Property="entry => entry.WochenberichtId" />
+    <PropertyColumn Property="entry => entry.Datum" />
+    <PropertyColumn Property="entry => entry.Tagestyp" />
+    <PropertyColumn Property="entry => entry.Auftragsnummer" />
+    <PropertyColumn Property="entry => entry.Titel" />
+    <PropertyColumn Property="entry => entry.Beschreibung" />
+    <PropertyColumn Property="entry => entry.Notiz" />
+    <PropertyColumn Property="entry => entry.Fach" />
+    <PropertyColumn Property="entry => entry.Startzeit" />
+    <PropertyColumn Property="entry => entry.Endzeit" />
+    <PropertyColumn Property="entry => entry.Dauer" />
+    <PropertyColumn Property="entry => entry.Status" />
+    <PropertyColumn Property="entry => entry.ErstelltAm" />
+    <PropertyColumn Property="entry => entry.GeändertAm" />
 
-    <TemplateColumn Context="BerichtEintraege">
-        <a href="@($"BerichtEintraeges/edit?id={BerichtEintraege.Id}")">Edit</a> |
-        <a href="@($"BerichtEintraeges/details?id={BerichtEintraege.Id}")">Details</a> |
-        <a href="@($"BerichtEintraeges/delete?id={BerichtEintraege.Id}")">Delete</a>
+    <TemplateColumn Context="entry">
+        <a href="@($"BerichtEintraeges/edit?id={entry.Id}")">Edit</a> |
+        <a href="@($"BerichtEintraeges/details?id={entry.Id}")">Details</a> |
+        <a href="@($"BerichtEintraeges/delete?id={entry.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
-    private AzubiLog_BlazorContext context = default!;
+    private xAzubiLog.Data.xAzubiLogContext context = default!;
 
     protected override void OnInitialized()
     {
