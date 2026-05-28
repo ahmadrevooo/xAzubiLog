@@ -11,7 +11,7 @@
    
 
     @if (!string.IsNullOrWhiteSpace(statusMessage))
-    {
+    { 
         <div class="alert alert-light border status-alert" role="status">
             @statusMessage
         </div>
@@ -49,10 +49,10 @@
 @code {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
 
-    private BerichtEintrag currentEntry = new();
+    private BerichtEintraege currentEntry = new();
     private IReadOnlyList<Kategorie> categories = [];
-    private IReadOnlyList<BerichtEintrag> dailyEntries = [];
-    private IReadOnlyList<BerichtEintrag> weeklyEntries = [];
+    private IReadOnlyList<BerichtEintraege> dailyEntries = [];
+    private IReadOnlyList<BerichtEintraege> weeklyEntries = [];
     private DateTime selectedDate = DateTime.Today;
     private int? selectedEntryId;
     private string trainerName = "";
@@ -171,9 +171,9 @@
     /// <summary>
     /// Creates a detached copy so the overview list is not modified before saving.
     /// </summary>
-    private static BerichtEintrag CopyEntry(BerichtEintrag entry)
+    private static BerichtEintraege CopyEntry(BerichtEintraege entry)
     {
-        return new BerichtEintrag
+        return new BerichtEintraege
         {
             Id = entry.Id,
             BenutzerId = entry.BenutzerId,

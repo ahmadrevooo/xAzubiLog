@@ -27,6 +27,21 @@ namespace xAzubiLog.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PasswortResetTokens",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Token = table.Column<string>(type: "TEXT", nullable: false),
+                    Ablauf = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswortResetTokens", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -39,7 +54,8 @@ namespace xAzubiLog.Migrations
                     Schule = table.Column<string>(type: "TEXT", nullable: false),
                     Klasse = table.Column<string>(type: "TEXT", nullable: false),
                     Ausbildungsberuf = table.Column<string>(type: "TEXT", nullable: false),
-                    Aktiv = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Aktiv = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Rolle = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -180,6 +196,9 @@ namespace xAzubiLog.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BerichtEintraege");
+
+            migrationBuilder.DropTable(
+                name: "PasswortResetTokens");
 
             migrationBuilder.DropTable(
                 name: "Ausbilder");

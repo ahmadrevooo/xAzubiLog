@@ -21,7 +21,7 @@ namespace xAzubiLog.Data
         {
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<Wochenbericht>().ToTable("Wochenbericht");
-            modelBuilder.Entity<BerichtEintraege>().ToTable("BerichtEintrag");
+            modelBuilder.Entity<BerichtEintraege>().ToTable("BerichtEintraege");
             modelBuilder.Entity<Kategorie>().ToTable("Kategorie");
             modelBuilder.Entity<Ausbilder>().ToTable("Ausbilder");
         }

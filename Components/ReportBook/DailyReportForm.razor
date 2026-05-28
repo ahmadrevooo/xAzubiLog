@@ -106,11 +106,11 @@
 @code {
     private EditContext? editContext;
     private ValidationMessageStore? validationMessages;
-    private BerichtEintrag? previousEntry;
+    private BerichtEintraege? previousEntry;
     private string startTimeText = "";
     private string endTimeText = "";
 
-    [Parameter, EditorRequired] public BerichtEintrag Entry { get; set; } = default!;
+    [Parameter, EditorRequired] public BerichtEintraege Entry { get; set; } = default!;
     [Parameter] public IReadOnlyList<Kategorie> Categories { get; set; } = [];
     [Parameter] public string TrainerName { get; set; } = "";
     [Parameter] public EventCallback<string> TrainerNameChanged { get; set; }
