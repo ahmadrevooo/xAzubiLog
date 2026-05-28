@@ -1,50 +1,45 @@
 ﻿@inject xAzubiLog.Services.AuthService Auth
 @inject NavigationManager Nav
-
 <nav class="py-3 px-4 border-bottom">
     <div class="d-flex justify-content-between align-items-center">
-
         <!-- LOGO -->
         <a class="fw-semibold text-decoration-none" href="/" style="font-size: 1.2rem;">
             AzubiLog
         </a>
-
         <!-- NAVIGATION -->
         <div class="d-flex gap-4 align-items-center">
-
             <NavLink href="BerichtEintraeges/create" class="nav-link">
                 Einträge
             </NavLink>
-
             <NavLink href="weekly" class="nav-link">
                 Wochenbericht
             </NavLink>
-
             <NavLink href="create" class="nav-link">
                 Eintrag erstellen
             </NavLink>
-
             <NavLink href="tagesberichte" class="nav-link">
                 Tagesberichte
             </NavLink>
-
             <NavLink href="Wochenübersicht" class="nav-link">
                 Wochenübersicht
             </NavLink>
-
         </div>
-
         <!-- USER -->
         <div>
             @if (Auth.IsAuthenticated && Auth.CurrentUser != null)
             {
-                <span>
-                    @Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname
-                </span>
-
-                <a href="/logout" class="ms-3 text-danger text-decoration-none">
-                    Abmelden
-                </a>
+                <div class="profile-menu">
+                    <div class="profile-avatar">
+                        @Auth.CurrentUser!.Vorname[0]@Auth.CurrentUser!.Nachname[0]
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="profile-name">@Auth.CurrentUser!.Vorname @Auth.CurrentUser!.Nachname</div>
+                        <div class="profile-role">@Auth.CurrentUser!.Rolle</div>
+                        <hr style="border-color:#1f1f1f; margin: 0.5rem 0;" />
+                        <a href="/konto" class="profile-logout" style="color:white;">Konto bearbeiten</a>
+                        <a href="/logout" class="profile-logout">Abmelden</a>
+                    </div>
+                </div>
             }
             else
             {
@@ -53,18 +48,82 @@
                 </a>
             }
         </div>
-
     </div>
 </nav>
-
 <style>
     .nav-link {
         text-decoration: none;
         color: inherit;
         opacity: 0.8;
     }
-
     .nav-link:hover {
         opacity: 1;
     }
+
+    .profile-menu {
+        position: relative;
+        padding: 10px 0;
+        margin: -10px 0;
+        cursor: pointer;
+    }
+
+    .profile-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00ff75, #3700ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: white;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #0a0a0a;
+        border: 1px solid #1f1f1f;
+        border-radius: 8px;
+        min-width: 200px;
+        padding: 1rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+
+    .profile-menu:hover .profile-dropdown {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .profile-name {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .profile-role {
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+
+    .profile-logout {
+        display: block;
+        color: #ff6b6b;
+        text-decoration: none;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        transition: opacity 0.2s;
+    }
+
+    .profile-logout:hover { opacity: 0.7; }
 </style>
