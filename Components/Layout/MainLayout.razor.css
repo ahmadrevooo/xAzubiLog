@@ -37,6 +37,8 @@ main {
     justify-content: flex-end;
 }
 
+
+
 /* Responsive Anpassungen (Desktop) */
 @media (min-width: 641px) {
     .page {

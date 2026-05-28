@@ -1,6 +1,6 @@
 ﻿@page "/register"
 @rendermode InteractiveServer
-@inject xAzubiLog.Data.AzubiLog_BlazorContext DB
+@inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
 
 <PageTitle>Registrieren – xAzubiLog</PageTitle>
@@ -239,7 +239,7 @@
             return;
         }
 
-        bool emailExistiert = DB.Users.Any(u => u.Email == email);
+        bool emailExistiert = DB.User.Any(u => u.Email == email);
         if (emailExistiert)
         {
             fehler = "Diese E-Mail ist bereits registriert.";
@@ -256,7 +256,7 @@
             Aktiv = true
         };
 
-        DB.Users.Add(neuerUser);
+        DB.User.Add(neuerUser);
         await DB.SaveChangesAsync();
 
         erfolg = true;

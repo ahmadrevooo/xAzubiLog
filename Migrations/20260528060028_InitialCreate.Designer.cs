@@ -10,15 +10,15 @@ using xAzubiLog.Data;
 
 namespace xAzubiLog.Migrations
 {
-    [DbContext(typeof(AzubiLog_BlazorContext))]
-    [Migration("20260528060028_InitialCreate")]
+    [DbContext(typeof(xAzubiLog.Data.xAzubiLogContext))]
+    [Migration("20260430095701_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("xAzubiLog.Models.Ausbilder", b =>
                 {
@@ -40,7 +40,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Ausbilder", (string)null);
+                    b.ToTable("Ausbilder");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
@@ -115,7 +115,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("WochenberichtId");
 
-                    b.ToTable("BerichtEintraege", (string)null);
+                    b.ToTable("BerichtEintraege");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Kategorie", b =>
@@ -142,28 +142,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Kategorie", (string)null);
-                });
-
-            modelBuilder.Entity("xAzubiLog.Models.PasswortResetToken", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Ablauf")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("PasswortResetTokens");
+                    b.ToTable("Kategorie");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.User", b =>
@@ -195,10 +174,6 @@ namespace xAzubiLog.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Rolle")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Schule")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -209,7 +184,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Wochenbericht", b =>
@@ -245,7 +220,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Wochenbericht", (string)null);
+                    b.ToTable("Wochenbericht");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>

@@ -6,7 +6,7 @@
 @using xAzubiLog.Services
 @using Microsoft.EntityFrameworkCore
 
-@inject AzubiLog_BlazorContext DB
+@inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
 @inject EmailService _emailService
 
@@ -180,13 +180,13 @@
                 return;
             }
 
-            var user = await DB.Users
+            var user = await DB.User
     .FirstOrDefaultAsync(u =>
         u.Email.ToLower().Trim() == email.ToLower().Trim());
 
-Console.WriteLine($"USER COUNT: {await DB.Users.CountAsync()}");
+Console.WriteLine($"USER COUNT: {await DB.User.CountAsync()}");
 
-var allUsers = await DB.Users.ToListAsync();
+var allUsers = await DB.User.ToListAsync();
 foreach (var u in allUsers)
 {
     Console.WriteLine($"DB EMAIL: '{u.Email}'");

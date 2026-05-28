@@ -14,12 +14,11 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys")));
 
 // Datenbank
-
-builder.Services.AddDbContextFactory<AzubiLog_BlazorContext>(options =>
+builder.Services.AddDbContextFactory<xAzubiLog.Data.xAzubiLogContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
 builder.Services.AddSingleton<xAzubiLog.Services.AuthService>();
 
-builder.Services.AddScoped<ReportBookService>();
+builder.Services.AddScoped<xAzubiLog.Services.ReportBookService>();
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 

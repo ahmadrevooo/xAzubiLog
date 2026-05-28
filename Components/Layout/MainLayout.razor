@@ -1,24 +1,47 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 @inject xAzubiLog.Services.ThemeService Theme
 @inject IJSRuntime JS
 
-<div>
+<div class="app-layout">
     <NavMenu />
 
-    <main>
+    <main class="content">
         @Body
     </main>
 </div>
 
 @code {
+    private Action? themeHandler;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await Theme.InitializeAsync(false);
-            await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
+        if (!firstRender) return;
 
-            StateHasChanged();
+        // read stored theme from localStorage (via JS interop)
+        string? stored = null;
+        try
+        {
+            stored = await JS.InvokeAsync<string?>("localStorage.getItem", "theme");
+        }
+        catch { }
+
+        var isDark = string.Equals(stored, "dark", StringComparison.OrdinalIgnoreCase);
+        await Theme.InitializeAsync(isDark);
+        await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
+
+        // subscribe to theme changes to update JS state
+        themeHandler = () => { _ = JS.InvokeVoidAsync("setTheme", Theme.IsDark); };
+        Theme.OnChange += themeHandler;
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (themeHandler is not null)
+        {
+            Theme.OnChange -= themeHandler;
         }
     }
 }

@@ -5,17 +5,26 @@ using xAzubiLog.Models;
 
 namespace xAzubiLog.Services;
 
+/// <summary>
+/// Provides data access and small workflow helpers for the report book module.
+/// </summary>
 public sealed class ReportBookService
 {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
-    private static readonly string[] DefaultCategories = ["Intern", "Extern", "Entwicklung", "Support", "Meeting", "Dokumentation"];
-    private readonly IDbContextFactory<AzubiLog_BlazorContext> dbFactory;
+    private static readonly string[] DefaultCategories = new[] { "Intern", "Extern", "Entwicklung", "Support", "Meeting", "Dokumentation" };
+    private readonly IDbContextFactory<xAzubiLogContext> dbFactory;
 
-    public ReportBookService(IDbContextFactory<AzubiLog_BlazorContext> dbFactory)
+    /// <summary>
+    /// Creates a service instance with an EF Core context factory.
+    /// </summary>
+    public ReportBookService(IDbContextFactory<xAzubiLogContext> dbFactory)
     {
         this.dbFactory = dbFactory;
     }
 
+    /// <summary>
+    /// Loads all data required by the daily and weekly overview.
+    /// </summary>
     public async Task<ReportBookData> LoadAsync(DateTime selectedDate)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
@@ -27,43 +36,49 @@ public sealed class ReportBookService
         var startOfWeek = GetStartOfWeek(selectedDate);
         var endOfWeek = startOfWeek.AddDays(7);
 
-        var categories = await context.Kategorien
+        var categories = await context.Kategorie
             .AsNoTracking()
-            .Where(c => c.BenutzerId == workContext.UserId)
-            .OrderBy(c => c.Reihenfolge)
-            .ThenBy(c => c.Name)
+            .Where(category => category.BenutzerId == workContext.UserId)
+            .OrderBy(category => category.Reihenfolge)
+            .ThenBy(category => category.Name)
             .ToListAsync();
 
         var dailyEntries = await context.BerichtEintraege
             .AsNoTracking()
-            .Include(e => e.Kategorie)
-            .Include(e => e.Ausbilder)
-            .Where(e => e.BenutzerId == workContext.UserId && e.Datum >= startOfDay && e.Datum < endOfDay)
-            .OrderBy(e => e.Startzeit)
-            .ThenBy(e => e.Titel)
+            .Include(entry => entry.Kategorie)
+            .Include(entry => entry.Ausbilder)
+            .Where(entry => entry.BenutzerId == workContext.UserId && entry.Datum >= startOfDay && entry.Datum < endOfDay)
+            .OrderBy(entry => entry.Startzeit)
+            .ThenBy(entry => entry.Titel)
             .ToListAsync();
 
         var weeklyEntries = await context.BerichtEintraege
             .AsNoTracking()
-            .Include(e => e.Kategorie)
-            .Where(e => e.BenutzerId == workContext.UserId && e.Datum >= startOfWeek && e.Datum < endOfWeek)
-            .OrderBy(e => e.Datum)
-            .ThenBy(e => e.Startzeit)
+            .Include(entry => entry.Kategorie)
+            .Where(entry => entry.BenutzerId == workContext.UserId && entry.Datum >= startOfWeek && entry.Datum < endOfWeek)
+            .OrderBy(entry => entry.Datum)
+            .ThenBy(entry => entry.Startzeit)
             .ToListAsync();
 
         return new ReportBookData(categories, dailyEntries, weeklyEntries);
     }
 
+    /// <summary>
+    /// Loads one existing report entry for editing.
+    /// </summary>
     public async Task<BerichtEintraege?> GetEntryAsync(int entryId)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
 
         return await context.BerichtEintraege
             .AsNoTracking()
-            .Include(e => e.Ausbilder)
-            .FirstOrDefaultAsync(e => e.Id == entryId);
+            .Include(entry => entry.Ausbilder)
+            .FirstOrDefaultAsync(entry => entry.Id == entryId);
     }
 
+    /// <summary>
+    /// Inserts or updates a report entry and resolves optional category and trainer data.
+    /// </summary>
     public async Task<int> SaveEntryAsync(BerichtEintraege entry, string? trainerName, string? newCategoryName, string? newCategoryColor)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
@@ -86,7 +101,7 @@ public sealed class ReportBookService
         }
         else
         {
-            var existing = await context.BerichtEintraege.FirstAsync(e => e.Id == entry.Id);
+            var existing = await context.BerichtEintraege.FirstAsync(item => item.Id == entry.Id);
             existing.AusbilderId = entry.AusbilderId;
             existing.KategorieId = entry.KategorieId;
             existing.WochenberichtId = entry.WochenberichtId;
@@ -108,17 +123,26 @@ public sealed class ReportBookService
         return entry.Id;
     }
 
+    /// <summary>
+    /// Deletes a report entry by id if it still exists.
+    /// </summary>
     public async Task DeleteEntryAsync(int entryId)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
-        var entry = await context.BerichtEintraege.FirstOrDefaultAsync(e => e.Id == entryId);
+        var entry = await context.BerichtEintraege.FirstOrDefaultAsync(item => item.Id == entryId);
 
-        if (entry is null) return;
+        if (entry is null)
+        {
+            return;
+        }
 
         context.BerichtEintraege.Remove(entry);
         await context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Creates a detached draft entry with useful defaults for the selected day.
+    /// </summary>
     public BerichtEintraege CreateDraftEntry(DateTime selectedDate)
     {
         var start = selectedDate.Date.AddHours(Math.Max(8, DateTime.Now.Hour));
@@ -137,50 +161,73 @@ public sealed class ReportBookService
         };
     }
 
-    public static decimal CalculateDuration(DateTime start, DateTime end)
+    /// <summary>
+    /// Calculates worked hours from start and end time.
+    /// </summary>
+    public static decimal CalculateDuration(DateTime startTime, DateTime endTime)
     {
-        return end <= start ? 0 : Math.Round((decimal)(end - start).TotalHours, 2);
+        if (endTime <= startTime)
+        {
+            return 0;
+        }
+
+        return Math.Round((decimal)(endTime - startTime).TotalHours, 2);
     }
 
-    public static DateTime GetStartOfWeek(DateTime date)
+    /// <summary>
+    /// Returns the Monday of the selected calendar week.
+    /// </summary>
+    public static DateTime GetStartOfWeek(DateTime selectedDate)
     {
-        var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
-        return date.AddDays(-diff).Date;
+        var difference = ((7 + (selectedDate.Date.DayOfWeek - DayOfWeek.Monday)) % 7);
+        return selectedDate.Date.AddDays(-difference);
     }
 
-    private static int GetCalendarWeek(DateTime date)
+    private static int GetCalendarWeek(DateTime selectedDate)
     {
-        return GermanCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        return GermanCulture.Calendar.GetWeekOfYear(selectedDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
     }
 
-    private static async Task EnsureDefaultCategoriesAsync(AzubiLog_BlazorContext context, int userId)
+    private static async Task EnsureDefaultCategoriesAsync(xAzubiLogContext context, int userId)
     {
-        var existingNames = await context.Kategorien
-            .Where(c => c.BenutzerId == userId)
-            .Select(c => c.Name)
+        var existingNames = await context.Kategorie
+            .Where(category => category.BenutzerId == userId)
+            .Select(category => category.Name)
             .ToListAsync();
 
-        var missing = DefaultCategories
+        var missingCategories = DefaultCategories
             .Where(name => !existingNames.Contains(name))
-            .Select((name, i) => new Kategorie
+            .Select((name, index) => new Kategorie
             {
                 BenutzerId = userId,
                 Name = name,
-                FarbeHex = "#334155",
-                Reihenfolge = existingNames.Count + i + 1
-            }).ToList();
+                FarbeHex = PickCategoryColor(name),
+                Reihenfolge = existingNames.Count + index + 1
+            })
+            .ToList();
 
-        if (missing.Any())
+        if (missingCategories.Count == 0)
         {
-            context.Kategorien.AddRange(missing);
-            await context.SaveChangesAsync();
+            return;
         }
+
+        context.Kategorie.AddRange(missingCategories);
+        await context.SaveChangesAsync();
     }
 
-    private static async Task<WorkContext> EnsureWorkContextAsync(AzubiLog_BlazorContext context, DateTime date)
+    private static string PickCategoryColor(string name) => name switch
     {
-        var user = await context.Users.OrderBy(u => u.ID).FirstOrDefaultAsync();
+        "Extern" => "#64748b",
+        "Entwicklung" => "#2563eb",
+        "Support" => "#0f766e",
+        "Meeting" => "#7c3aed",
+        "Dokumentation" => "#b45309",
+        _ => "#334155"
+    };
 
+    private static async Task<WorkContext> EnsureWorkContextAsync(xAzubiLogContext context, DateTime selectedDate)
+    {
+        var user = await context.User.OrderBy(item => item.ID).FirstOrDefaultAsync();
         if (user is null)
         {
             user = new User
@@ -188,65 +235,93 @@ public sealed class ReportBookService
                 Vorname = "Demo",
                 Nachname = "Azubi",
                 Email = "demo@azubilog.local",
+                Schule = "Berufsschule",
+                Klasse = "Demo",
+                Ausbildungsberuf = "Fachinformatik",
                 Aktiv = true
             };
-
-            context.Users.Add(user);
+            context.User.Add(user);
             await context.SaveChangesAsync();
         }
 
-        var week = GetCalendarWeek(date);
+        var week = GetCalendarWeek(selectedDate);
+        var weekReport = await context.Wochenbericht
+            .FirstOrDefaultAsync(report => report.BenutzerId == user.ID && report.Jahr == selectedDate.Year && report.Kalenderwoche == week);
 
-        var report = await context.Wochenberichte
-            .FirstOrDefaultAsync(r => r.BenutzerId == user.ID && r.Jahr == date.Year && r.Kalenderwoche == week);
-
-        if (report is null)
+        if (weekReport is null)
         {
-            report = new Wochenbericht
+            weekReport = new Wochenbericht
             {
                 BenutzerId = user.ID,
                 Kalenderwoche = week,
-                Jahr = date.Year,
-                Status = "Entwurf"
+                Jahr = selectedDate.Year,
+                Gesamtstunden = 0,
+                Status = "Entwurf",
+                Kommentar = ""
             };
-
-            context.Wochenberichte.Add(report);
+            context.Wochenbericht.Add(weekReport);
             await context.SaveChangesAsync();
         }
 
-        return new WorkContext(user.ID, report.Id);
+        return new WorkContext(user.ID, weekReport.Id);
     }
 
-    private static async Task<int?> ResolveCategoryIdAsync(AzubiLog_BlazorContext context, int userId, int? selectedId, string? name, string? color)
+    private static async Task<int?> ResolveCategoryIdAsync(
+        xAzubiLogContext context,
+        int userId,
+        int? selectedCategoryId,
+        string? newCategoryName,
+        string? newCategoryColor)
     {
-        if (string.IsNullOrWhiteSpace(name)) return selectedId;
+        if (string.IsNullOrWhiteSpace(newCategoryName))
+        {
+            return selectedCategoryId;
+        }
 
-        var existing = await context.Kategorien
-            .FirstOrDefaultAsync(c => c.BenutzerId == userId && c.Name == name);
+        var categoryName = newCategoryName.Trim();
+        var existing = await context.Kategorie
+            .FirstOrDefaultAsync(category => category.BenutzerId == userId && category.Name == categoryName);
 
-        if (existing != null) return existing.ID;
+        if (existing is not null)
+        {
+            return existing.ID;
+        }
 
+        var nextOrder = await context.Kategorie.CountAsync(category => category.BenutzerId == userId) + 1;
         var category = new Kategorie
         {
             BenutzerId = userId,
-            Name = name,
-            FarbeHex = color ?? "#334155"
+            Name = categoryName,
+            FarbeHex = string.IsNullOrWhiteSpace(newCategoryColor) ? "#334155" : newCategoryColor,
+            Reihenfolge = nextOrder
         };
 
-        context.Kategorien.Add(category);
+        context.Kategorie.Add(category);
         await context.SaveChangesAsync();
 
         return category.ID;
     }
 
-    private static async Task<int?> ResolveTrainerIdAsync(AzubiLog_BlazorContext context, string? trainerName)
+    private static async Task<int?> ResolveTrainerIdAsync(xAzubiLogContext context, string? trainerName)
     {
-        if (string.IsNullOrWhiteSpace(trainerName)) return null;
+        if (string.IsNullOrWhiteSpace(trainerName))
+        {
+            return null;
+        }
 
-        var trainer = await context.Ausbilder.FirstOrDefaultAsync(a => a.Name == trainerName);
-        if (trainer != null) return trainer.ID;
+        var normalizedName = trainerName.Trim();
+        var trainer = await context.Ausbilder.FirstOrDefaultAsync(item => item.Name == normalizedName);
 
-        trainer = new Ausbilder { Name = trainerName };
+        if (trainer is not null)
+        {
+            return trainer.ID;
+        }
+
+        trainer = new Ausbilder
+        {
+            Name = normalizedName
+        };
+
         context.Ausbilder.Add(trainer);
         await context.SaveChangesAsync();
 
@@ -256,6 +331,9 @@ public sealed class ReportBookService
     private readonly record struct WorkContext(int UserId, int WeekReportId);
 }
 
+/// <summary>
+/// Groups the read data needed by the report book page.
+/// </summary>
 public sealed record ReportBookData(
     IReadOnlyList<Kategorie> Categories,
     IReadOnlyList<BerichtEintraege> DailyEntries,

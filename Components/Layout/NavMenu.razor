@@ -1,267 +1,70 @@
 ﻿@inject xAzubiLog.Services.AuthService Auth
 @inject NavigationManager Nav
-@inject xAzubiLog.Services.ThemeService Theme
-@inject IJSRuntime JS
 
-<nav class="py-4 px-4 px-md-5" style="background-color: transparent;">
-    <div class="d-flex justify-content-between align-items-center w-100">
+<nav class="py-3 px-4 border-bottom">
+    <div class="d-flex justify-content-between align-items-center">
 
         <!-- LOGO -->
-        <a class="d-flex align-items-center text-decoration-none" href="">
-            <span class="fw-medium" style="font-size: 1.2rem;">
-                AzubiLog
-            </span>
+        <a class="fw-semibold text-decoration-none" href="/" style="font-size: 1.2rem;">
+            AzubiLog
         </a>
 
         <!-- NAVIGATION -->
-        <div class="d-none d-lg-flex align-items-center justify-content-center">
-            <div style="display: flex; gap: 3rem;">
+        <div class="d-flex gap-4 align-items-center">
 
-                <NavLink href="BerichtEintraeges/create"
-                         class="sqs-nav-link">
-                    Einträge
-                </NavLink>
+            <NavLink href="BerichtEintraeges/create" class="nav-link">
+                Einträge
+            </NavLink>
 
-                <NavLink href="weekly"
-                         class="sqs-nav-link">
-                    Wochenbericht
-                </NavLink>
+            <NavLink href="weekly" class="nav-link">
+                Wochenbericht
+            </NavLink>
 
-                <NavLink href="create"
-                         class="sqs-nav-link">
-                    Eintrag erstellen
-                </NavLink>
+            <NavLink href="create" class="nav-link">
+                Eintrag erstellen
+            </NavLink>
 
-                <NavLink href="tagesberichte"
-                         class="sqs-nav-link">
-                    Tagesberichte
-                </NavLink>
+            <NavLink href="tagesberichte" class="nav-link">
+                Tagesberichte
+            </NavLink>
 
-                <NavLink href="Wochenübersicht"
-                         class="sqs-nav-link">
-                    Wochenübersicht
-                </NavLink>
+            <NavLink href="Wochenübersicht" class="nav-link">
+                Wochenübersicht
+            </NavLink>
 
-            </div>
         </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="d-none d-lg-flex align-items-center gap-3">
-
-            <!-- THEME TOGGLE -->
-            <div class="d-flex align-items-center gap-2">
-
-                <span style="font-size: 0.8rem; opacity: 0.7;">
-                    @(Theme.IsDark ? "Dark" : "Light")
-                </span>
-
-                <label class="ui-switch">
-
-                    <input type="checkbox"
-                           checked="@(!Theme.IsDark)"
-                           @onchange="async e => await ToggleTheme()" />
-
-                    <div class="slider">
-                        <div class="circle"></div>
-                    </div>
-
-                </label>
-
-            </div>
-
-            <!-- USER -->
+        <!-- USER -->
+        <div>
             @if (Auth.IsAuthenticated && Auth.CurrentUser != null)
             {
-                <div class="profile-menu">
+                <span>
+                    @Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname
+                </span>
 
-                    <div class="profile-avatar">
-                        @Auth.CurrentUser.Vorname[0]@Auth.CurrentUser.Nachname[0]
-                    </div>
-
-                    <div class="profile-dropdown">
-
-                        <div class="profile-name">
-                            @Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname
-                        </div>
-
-                        <div class="profile-role">
-                            @Auth.CurrentUser.Rolle
-                        </div>
-
-                        <hr />
-
-                        <a href="/logout" class="profile-logout">
-                            Abmelden
-                        </a>
-
-                    </div>
-
-                </div>
+                <a href="/logout" class="ms-3 text-danger text-decoration-none">
+                    Abmelden
+                </a>
             }
             else
             {
-                <a href="/login" class="login-link">
+                <a href="/login" class="text-decoration-none">
                     Anmelden
                 </a>
             }
-
         </div>
 
     </div>
 </nav>
 
 <style>
-
-    .sqs-nav-link {
+    .nav-link {
+        text-decoration: none;
         color: inherit;
-        text-decoration: none;
-        opacity: 0.85;
-        transition: opacity 0.2s ease;
-    }
-
-    .sqs-nav-link:hover {
-        opacity: 1;
-    }
-
-    .login-link {
-        color: inherit;
-        text-decoration: none;
-        opacity: 0.85;
-    }
-
-    .profile-avatar {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #00ff75, #3700ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        color: white;
-    }
-
-    .profile-menu {
-        position: relative;
-        cursor: pointer;
-    }
-
-    .profile-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: #0a0a0a;
-        border: 1px solid #1f1f1f;
-        border-radius: 8px;
-        padding: 1rem;
-        display: none;
-        min-width: 180px;
-        z-index: 1000;
-    }
-
-    .profile-menu:hover .profile-dropdown {
-        display: block;
-    }
-
-    .profile-name {
-        font-weight: 600;
-        color: white;
-    }
-
-    .profile-role {
-        font-size: 0.8rem;
-        color: gray;
-    }
-
-    .profile-logout {
-        color: #ff6b6b;
-        text-decoration: none;
-    }
-
-    .profile-logout:hover {
         opacity: 0.8;
     }
 
-    /* SWITCH */
-
-    .ui-switch {
-
-        --switch-bg: rgb(135, 150, 165);
-        --switch-width: 48px;
-        --switch-height: 20px;
-
-        --circle-diameter: 32px;
-        --circle-bg: rgb(232, 89, 15);
-
-        --circle-inset: calc(
-            (var(--circle-diameter) - var(--switch-height)) / 2
-        );
+    .nav-link:hover {
+        opacity: 1;
     }
-
-    .ui-switch input {
-        display: none;
-    }
-
-    .slider {
-
-        appearance: none;
-
-        width: var(--switch-width);
-        height: var(--switch-height);
-
-        background: var(--switch-bg);
-
-        border-radius: 999px;
-
-        position: relative;
-
-        cursor: pointer;
-    }
-
-    .slider .circle {
-
-        top: calc(var(--circle-inset) * -1);
-        left: 0;
-
-        width: var(--circle-diameter);
-        height: var(--circle-diameter);
-
-        position: absolute;
-
-        background: var(--circle-bg);
-
-        border-radius: inherit;
-
-        transition: left 150ms cubic-bezier(0.4,0,0.2,1);
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        box-shadow:
-            0px 2px 1px -1px rgba(0,0,0,0.2),
-            0px 1px 1px 0px rgba(0,0,0,0.14),
-            0px 1px 3px 0px rgba(0,0,0,0.12);
-    }
-
-    .ui-switch input:checked + .slider .circle {
-
-        left: calc(100% - var(--circle-diameter));
-
-        background-color: rgb(0, 56, 146);
-    }
-
 </style>
-
-@code {
-
-    async Task ToggleTheme()
-    {
-        Theme.Toggle();
-
-        Console.WriteLine("Toggle pressed: " + Theme.IsDark);
-
-        await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
-    }
-
-}

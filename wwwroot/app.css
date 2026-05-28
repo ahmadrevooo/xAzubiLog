@@ -1,34 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+:root {
+    --bg-light: #f6f8fa;
+    --text-light: #1f2328;
+    --nav-light: #ffffff;
+
+    --bg-dark: #0d1117;
+    --text-dark: #ffffff;
+    --nav-dark: rgba(0,0,0,0.0);
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
 body.theme-dark {
-    background-color: #211e1d;
-    color: #ffffff;
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
 }
 
 body.theme-light {
-    background-color: #f6f8fa;
-    color: #1f2328;
+    background-color: var(--bg-light);
+    color: var(--text-light);
 }
 
-/* DARK MODE */
-body.theme-dark {
-    background-color: #0d1117;
-    color: #ffffff;
+/* NAVBAR */
+.topbar {
+    background: transparent;
 }
 
-/* LIGHT MODE */
-body.theme-light {
-    background-color: #f6f8fa;
-    color: #1f2328;
-}
-
-/* LINKS */
-a {
-    color: inherit;
-    text-decoration: none;
+.theme-light .topbar {
+    background: var(--nav-light);
 }
 
 /* CARDS */
+.card {
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
 .theme-dark .card {
     background: #161b22;
     color: white;
@@ -36,19 +47,34 @@ a {
 
 .theme-light .card {
     background: white;
-    color: #1f2328;
+    color: var(--text-light);
 }
 
-.theme-light nav {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+/* LINKS */
+a {
+    color: inherit;
 }
 
-.theme-dark nav {
-    background-color: transparent;
+/* SIMPLE UTILITIES */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
+/* MAKE INPUTS LOOK GOOD IN BOTH THEMES */
+input, textarea, select {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 0.5rem;
+    border-radius: 6px;
+    color: inherit;
+}
 
-nav {
-    color: inherit !important;
+.theme-dark input, .theme-dark textarea, .theme-dark select {
+    border-color: rgba(255,255,255,0.06);
+}
+
+.theme-light input, .theme-light textarea, .theme-light select {
+    border-color: rgba(0,0,0,0.08);
 }

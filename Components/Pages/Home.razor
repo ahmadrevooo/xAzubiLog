@@ -1,7 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @inject xAzubiLog.Services.AuthService Auth
-@inject xAzubiLog.Data.AzubiLog_BlazorContext DB
+@inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
 @using Microsoft.EntityFrameworkCore
 @using xAzubiLog.Models
@@ -41,8 +41,8 @@ else
             <div class="topbar">
                 <div class="nav-links">
                     <a class="nav-link active" href="/">Dashboard</a>
-                    <a class="nav-link" href="/berichte/neu">Neuer Bericht</a>
-                    <a class="nav-link" href="/berichte">Verlauf</a>
+                    <a class="nav-link" href="/tagesberichte">Neuer Bericht</a>
+                    <a class="nav-link" href="/Wochenübersicht">Verlauf</a>
                 </div>
                 <div class="user-badge">
                     <div class="user-dot"></div>
@@ -65,12 +65,12 @@ else
             <div class="cards">
                 <div class="card-item teal">
                     <div class="card-title">Neuen Nachweis erstellen</div>
-                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/berichte/neu")'>Eintrag erstellen</button>
+                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/tagesberichte")'>Eintrag erstellen</button>
                     <div class="card-icon">&#9998;</div>
                 </div>
                 <div class="card-item blue">
                     <div class="card-title">Letzte Einträge ansehen</div>
-                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/berichte")'>Verlauf anzeigen</button>
+                    <button class="card-btn" @onclick='() => Nav.NavigateTo("/Wochenübersicht")'>Verlauf anzeigen</button>
                     <div class="card-icon">&#128197;</div>
                 </div>
                 <div class="card-item purple">
@@ -334,7 +334,7 @@ else
             .Take(4)
             .ToListAsync();
 
-        unvollstaendig = await DB.Wochenberichte
+        unvollstaendig = await DB.Wochenbericht
             .Where(w => w.BenutzerId == userId && w.Status != "Abgeschlossen")
             .OrderByDescending(w => w.Jahr)
             .ThenByDescending(w => w.Kalenderwoche)
