@@ -3,42 +3,7 @@
 @inject xAzubiLog.Services.ThemeService Theme
 @inject IJSRuntime JS
 
-<nav class="topbar">
-    <div class="topbar-inner">
-        <div class="brand">
-            <a class="logo" href="/">AzubiLog</a>
-        </div>
 
-        <div class="nav-links">
-            <!--
-            <NavLink class="nav-link" href="tagesberichte">Tagesberichte</NavLink>
-            <NavLink class="nav-link" href="Wochenübersicht">Wochenübersicht</NavLink>
-            -->
-        </div>
-
-        <div class="actions">
-            <div class="theme-toggle">
-                <!-- <span class="theme-label">@(Theme.IsDark ? "Dark" : "Light")</span> 
-                <label class="ui-switch">
-                    <input type="checkbox" checked="@(!Theme.IsDark)" @onchange="async e => await ToggleTheme()" />
-                    <div class="slider"><div class="circle"></div></div>
-                </label>-->
-            </div>
-
-            @if (Auth.IsAuthenticated && Auth.CurrentUser != null)
-            {
-                <div class="profile">
-                    <div class="avatar">@Auth.CurrentUser.Vorname[0]@Auth.CurrentUser.Nachname[0]</div>
-                    <div class="profile-name">@Auth.CurrentUser.Vorname @Auth.CurrentUser.Nachname</div>
-                </div>
-            }
-            else
-            {
-                <a class="login-link" href="/login">Anmelden</a>
-            }
-        </div>
-    </div>
-</nav>
 
 <style>
     .sqs-nav-link {
