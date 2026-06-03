@@ -6,7 +6,7 @@ using xAzubiLog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DotNetEnv.Env.Load();
+DotNetEnv.Env.Load("/var/www/xazubilog/publish/.env");
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
