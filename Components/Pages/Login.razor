@@ -4,18 +4,6 @@
 @inject NavigationManager Nav
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
 
-async Task LoginAsync()
-{
-    fehler = null;
-    var user = await Auth.LoginAsync(email, passwort);
-    if (user != null)
-    {
-        await SessionStorage.SetAsync("userId", user.ID);
-        Nav.NavigateTo("/", forceLoad: true);
-    }
-    else
-        fehler = "E-Mail oder Passwort falsch.";
-}
 
 <PageTitle>Login – xAzubiLog</PageTitle>
 
@@ -200,12 +188,15 @@ async Task LoginAsync()
     string? fehler;
 
     async Task LoginAsync()
-{
-    fehler = null;
-    var user = await Auth.LoginAsync(email, passwort);
-    if (user != null)
-        Nav.NavigateTo("/", forceLoad: true);
-    else
-        fehler = "E-Mail oder Passwort falsch.";
-}
+    {
+        fehler = null;
+        var user = await Auth.LoginAsync(email, passwort);
+        if (user != null)
+        {
+            await SessionStorage.SetAsync("userId", user.ID);
+            Nav.NavigateTo("/", forceLoad: true);
+        }
+        else
+            fehler = "E-Mail oder Passwort falsch.";
+    }
 }
