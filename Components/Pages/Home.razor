@@ -326,10 +326,10 @@ else
 
         var userId = Auth.CurrentUser.ID;
 
-        anzahlBerichte = await DB.BerichtEintraege
+        anzahlBerichte = await DB.BerichtEintrag
             .CountAsync(b => b.BenutzerId == userId);
 
-        letzteEintraege = await DB.BerichtEintraege
+        letzteEintraege = await DB.BerichtEintrag
             .Where(b => b.BenutzerId == userId)
             .OrderByDescending(b => b.Datum)
             .Take(4)

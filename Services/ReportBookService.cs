@@ -43,7 +43,7 @@ public sealed class ReportBookService
             .ThenBy(category => category.Name)
             .ToListAsync();
 
-        var dailyEntries = await context.BerichtEintraege
+        var dailyEntries = await context.BerichtEintrag
             .AsNoTracking()
             .Include(entry => entry.Kategorie)
             .Include(entry => entry.Ausbilder)
@@ -52,7 +52,7 @@ public sealed class ReportBookService
             .ThenBy(entry => entry.Titel)
             .ToListAsync();
 
-        var weeklyEntries = await context.BerichtEintraege
+        var weeklyEntries = await context.BerichtEintrag
             .AsNoTracking()
             .Include(entry => entry.Kategorie)
             .Where(entry => entry.BenutzerId == workContext.UserId && entry.Datum >= startOfWeek && entry.Datum < endOfWeek)
@@ -70,7 +70,7 @@ public sealed class ReportBookService
     {
         await using var context = await dbFactory.CreateDbContextAsync();
 
-        return await context.BerichtEintraege
+        return await context.BerichtEintrag
             .AsNoTracking()
             .Include(entry => entry.Ausbilder)
             .FirstOrDefaultAsync(entry => entry.Id == entryId);
@@ -97,11 +97,11 @@ public sealed class ReportBookService
         {
             entry.ErstelltAm = DateTime.Now;
             entry.GeändertAm = DateTime.Now;
-            context.BerichtEintraege.Add(entry);
+            context.BerichtEintrag.Add(entry);
         }
         else
         {
-            var existing = await context.BerichtEintraege.FirstAsync(item => item.Id == entry.Id);
+            var existing = await context.BerichtEintrag.FirstAsync(item => item.Id == entry.Id);
             existing.AusbilderId = entry.AusbilderId;
             existing.KategorieId = entry.KategorieId;
             existing.WochenberichtId = entry.WochenberichtId;
@@ -129,14 +129,14 @@ public sealed class ReportBookService
     public async Task DeleteEntryAsync(int entryId)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
-        var entry = await context.BerichtEintraege.FirstOrDefaultAsync(item => item.Id == entryId);
+        var entry = await context.BerichtEintrag.FirstOrDefaultAsync(item => item.Id == entryId);
 
         if (entry is null)
         {
             return;
         }
 
-        context.BerichtEintraege.Remove(entry);
+        context.BerichtEintrag.Remove(entry);
         await context.SaveChangesAsync();
     }
 
