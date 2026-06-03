@@ -1,29 +1,15 @@
-﻿@page "/logout"
-@rendermode InteractiveServer
-
-@inject xAzubiLog.Services.AuthService Auth
+﻿@inject ProtectedSessionStorage SessionStorage
+@inject AuthService AuthService
 @inject NavigationManager Nav
-@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
 
-protected override async Task OnAfterRenderAsync(bool firstRender)
+private async Task Logout()
 {
-    if (firstRender)
-    {
-        await SessionStorage.DeleteAsync("userId");
-        Auth.Logout();
-        Nav.NavigateTo("/login", true);
-    }
-}
+    // 1. Session löschen (WICHTIG!)
+    await SessionStorage.DeleteAsync("userId");
 
-<p>Du wirst abgemeldet...</p>
+    // 2. AuthService reset
+    AuthService.Logout();
 
-@code {
-    protected override void OnInitialized()
-    {
-        // ✅ User wirklich ausloggen
-        Auth.Logout();
-
-        // ✅ Redirect zum Login
-        Nav.NavigateTo("/login", true);
-    }
+    // 3. Hard Redirect
+    Nav.NavigateTo("/login", true);
 }
