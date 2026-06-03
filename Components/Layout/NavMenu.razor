@@ -1,5 +1,7 @@
 ﻿@inject xAzubiLog.Services.AuthService Auth
 @inject NavigationManager Nav
+@rendermode InteractiveServer
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
 
 <nav class="py-4 px-4 px-md-5" style="background-color: transparent;">
     <div class="d-flex justify-content-between align-items-center w-100">
@@ -225,3 +227,22 @@
 
     .profile-logout:hover { opacity: 0.7; }
 </style>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !Auth.IsAuthenticated)
+        {
+            try
+            {
+                var result = await SessionStorage.GetAsync<int>("userId");
+                if (result.Success)
+                {
+                    await Auth.RestoreSessionAsync(result.Value);
+                    StateHasChanged();
+                }
+            }
+            catch { }
+        }
+    }
+}
