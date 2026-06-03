@@ -1,19 +1,22 @@
-﻿@page "/logout"
-@using xAzubiLog.Services
+﻿@using xAzubiLog.Services
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 @inject ProtectedSessionStorage SessionStorage
 @inject AuthService AuthService
 @inject NavigationManager Nav
 
-private async Task Logout()
-{
-    // 1. Session löschen (WICHTIG!)
-    await SessionStorage.DeleteAsync("userId");
+<button @onclick="Logout">Logout</button>
 
-    // 2. AuthService reset
-    AuthService.Logout();
+@code {
+    private async Task Logout()
+    {
+        // 1. Session löschen
+        await SessionStorage.DeleteAsync("userId");
 
-    // 3. Hard Redirect
-    Nav.NavigateTo("/login", true);
+        // 2. AuthService reset
+        AuthService.Logout();
+
+        // 3. Redirect
+        Nav.NavigateTo("/login", true);
+    }
 }
