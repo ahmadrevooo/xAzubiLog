@@ -43,12 +43,12 @@ namespace xAzubiLog.Services
 
             using var client = new SmtpClient();
             await client.ConnectAsync(
-                _config["Smtp:Host"],
-                int.Parse(_config["Smtp:Port"]!),
+                _config["Smtp__Host"],
+                int.Parse(_config["Smtp__Port"]!),
                 SecureSocketOptions.StartTls);
             await client.AuthenticateAsync(
-                _config["Smtp:User"],
-                _config["Smtp:Pass"]);
+                _config["Smtp__User"],
+                _config["Smtp__Pass"]);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
         }
