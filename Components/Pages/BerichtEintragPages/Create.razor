@@ -119,7 +119,7 @@
     private async Task AddBerichtEintraege()
     {
         using var context = DbFactory.CreateDbContext();
-        context.BerichtEintrag.Add(BerichtEintraege);
+        context.BerichtEintraege.Add(BerichtEintraege);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/BerichtEintraeges");
     }

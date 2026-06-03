@@ -11,7 +11,7 @@ namespace xAzubiLog.Data
         }
         public DbSet<User> User { get; set; } = default!;
         public DbSet<Wochenbericht> Wochenbericht { get; set; } = default!;
-        public DbSet<BerichtEintraege> BerichtEintrag { get; set; } = default!;
+        public DbSet<BerichtEintraege> BerichtEintraege { get; set; } = default!;
 
         // Compatibility wrappers for older code that referenced pluralized DbSet names
         public IQueryable<User> Users => User;

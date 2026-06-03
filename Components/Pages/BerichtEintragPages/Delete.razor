@@ -101,7 +101,7 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        BerichtEintraege = await context.BerichtEintrag.FirstOrDefaultAsync(m => m.Id == Id);
+        BerichtEintraege = await context.BerichtEintraege.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (BerichtEintraege is null)
         {
@@ -112,7 +112,7 @@
     private async Task DeleteBerichtEintraege()
     {
         using var context = DbFactory.CreateDbContext();
-        context.BerichtEintrag.Remove(BerichtEintraege!);
+        context.BerichtEintraege.Remove(BerichtEintraege!);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/BerichtEintraeges");
     }

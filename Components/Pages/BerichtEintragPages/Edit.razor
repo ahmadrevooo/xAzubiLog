@@ -127,7 +127,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        BerichtEintraege ??= await context.BerichtEintrag.FirstOrDefaultAsync(m => m.Id == Id);
+        BerichtEintraege ??= await context.BerichtEintraege.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (BerichtEintraege is null)
         {
@@ -164,6 +164,6 @@ else
     private bool BerichtEintraegeExists(int id)
     {
         using var context = DbFactory.CreateDbContext();
-        return context.BerichtEintrag.Any(e => e.Id == id);
+        return context.BerichtEintraege.Any(e => e.Id == id);
     }
 }
