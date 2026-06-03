@@ -1,0 +1,19 @@
+@inject AuthService Auth
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager Nav
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Auth.CurrentUser == null)
+        {
+            try
+            {
+                var result = await SessionStorage.GetAsync<int>("userId");
+                if (result.Success)
+                    await Auth.RestoreSessionAsync(result.Value);
+            }
+            catch { }
+        }
+    }
+}

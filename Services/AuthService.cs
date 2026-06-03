@@ -8,7 +8,6 @@ namespace xAzubiLog.Services
     {
         private readonly IDbContextFactory<xAzubiLogContext> _dbFactory;
         private User? _currentUser;
-
         public User? CurrentUser => _currentUser;
         public bool IsAuthenticated => _currentUser != null;
 
@@ -25,6 +24,15 @@ namespace xAzubiLog.Services
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswortHash)) return null;
             _currentUser = user;
             return user;
+        }
+
+        public async Task<bool> RestoreSessionAsync(int userId)
+        {
+            using var db = _dbFactory.CreateDbContext();
+            var user = await db.User.FirstOrDefaultAsync(u => u.ID == userId);
+            if (user == null) return false;
+            _currentUser = user;
+            return true;
         }
 
         public void Logout()
