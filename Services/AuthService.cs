@@ -7,7 +7,7 @@ namespace xAzubiLog.Services
     public class AuthService
     {
         private readonly IDbContextFactory<xAzubiLogContext> _dbFactory;
-        private static User? _currentUser;
+        private User? _currentUser;
 
         public User? CurrentUser => _currentUser;
         public bool IsAuthenticated => _currentUser != null;
