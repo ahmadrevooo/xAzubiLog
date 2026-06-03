@@ -367,3 +367,4 @@ DataProtectionKeys/
 run*.log
 *.db-shm
 *.db-wal
+.env

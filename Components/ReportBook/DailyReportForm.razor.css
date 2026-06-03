@@ -108,7 +108,7 @@ textarea.business-control {
 }
 
 select.business-control {
-    appearance: none;
+    appearance: none; 
     cursor: pointer;
 }
 
