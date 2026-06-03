@@ -40,6 +40,7 @@ else
         <div class="main">
             <div class="topbar">
                 <div class="nav-links">
+                    <a class="nav-link" href="/konto">Konto</a>
                     <a class="nav-link active" href="/">Dashboard</a>
                     <a class="nav-link" href="/tagesberichte">Neuer Bericht</a>
                     <a class="nav-link" href="/Wochenübersicht">Verlauf</a>
@@ -316,7 +317,7 @@ else
 
 @code {
     int anzahlBerichte = 0;
-    List<BerichtEintrag> letzteEintraege = new();
+    List<BerichtEintraege> letzteEintraege = new();
     List<Wochenbericht> unvollstaendig = new();
 
     protected override async Task OnInitializedAsync()
@@ -325,10 +326,10 @@ else
 
         var userId = Auth.CurrentUser.ID;
 
-        anzahlBerichte = await DB.BerichtEintrag
+        anzahlBerichte = await DB.BerichtEintraege
             .CountAsync(b => b.BenutzerId == userId);
 
-        letzteEintraege = await DB.BerichtEintrag
+        letzteEintraege = await DB.BerichtEintraege
             .Where(b => b.BenutzerId == userId)
             .OrderByDescending(b => b.Datum)
             .Take(4)

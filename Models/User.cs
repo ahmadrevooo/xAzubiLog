@@ -14,7 +14,7 @@
         public string Rolle { get; set; } = "Azubi";
 
         public List<Wochenbericht> Wochenberichte { get; set; } = new();
-        public List<BerichtEintrag> BerichtEintraege { get; set; } = new();
+        public List<BerichtEintraege> BerichtEintraege { get; set; } = new();
         public List<Kategorie> Kategorien { get; set; } = new();
     }
 }

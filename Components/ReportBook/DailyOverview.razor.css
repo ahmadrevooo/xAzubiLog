@@ -2,6 +2,19 @@
     display: grid;
     grid-template-rows: auto minmax(16rem, 1fr) auto;
     min-height: 100%;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .overview-header {
@@ -10,22 +23,22 @@
     justify-content: space-between;
     gap: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #30363d;
 }
 
 .module-eyebrow {
     display: block;
     margin-bottom: 0.25rem;
-    color: #475569;
-    font-size: 0.75rem;
+    color: #00ff75;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0;
+    letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 h2 {
     margin: 0;
-    color: #111827;
+    color: #ffffff;
     font-size: 1.25rem;
     line-height: 1.2;
     text-transform: capitalize;
@@ -37,9 +50,10 @@ h2 {
     min-width: 2.25rem;
     height: 2.25rem;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: linear-gradient(135deg, #0d4f3c, #1a7a5e);
+    color: #00ff75;
     font-weight: 800;
+    font-size: 0.9rem;
 }
 
 .entry-list {
@@ -51,9 +65,9 @@ h2 {
 
 .entry-item,
 .empty-state {
-    border: 1px solid #dbe3ea;
-    border-radius: 8px;
-    background: #ffffff;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    background: #0d1117;
 }
 
 .entry-item {
@@ -62,35 +76,38 @@ h2 {
     gap: 0.35rem 0.75rem;
     width: 100%;
     padding: 0.9rem;
-    color: #111827;
+    color: #c9d1d9;
     text-align: left;
     transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    cursor: pointer;
 }
 
-.entry-item:hover,
-.entry-item.selected {
-    border-color: #2563eb;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-    transform: translateY(-1px);
-}
+    .entry-item:hover {
+        border-color: #484f58;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        transform: translateY(-1px);
+    }
 
-.entry-item.selected {
-    background: #f8fbff;
-}
+    .entry-item.selected {
+        border-color: #00ff75;
+        box-shadow: 0 0 0 1px #00ff75, 0 4px 16px rgba(0, 255, 117, 0.1);
+        background: #0d2f1a;
+    }
 
 .time-range {
-    color: #475569;
+    color: #8b949e;
     font-size: 0.85rem;
     font-weight: 700;
 }
 
 .duration {
-    padding: 0.2rem 0.45rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 999px;
-    background: #f1f5f9;
-    color: #334155;
-    font-size: 0.8rem;
+    background: #21262d;
+    color: #00ff75;
+    font-size: 0.78rem;
     font-weight: 800;
+    border: 1px solid #30363d;
 }
 
 .entry-item strong,
@@ -101,6 +118,8 @@ h2 {
 
 .entry-item strong {
     overflow-wrap: anywhere;
+    color: #ffffff;
+    font-size: 0.95rem;
 }
 
 .category {
@@ -108,34 +127,38 @@ h2 {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    color: #475569;
+    color: #8b949e;
     font-size: 0.85rem;
     font-weight: 700;
 }
 
-.category::before {
-    content: "";
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 999px;
-    background: var(--category-color);
-}
+    .category::before {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 999px;
+        background: var(--category-color);
+    }
 
 .entry-item p {
     margin: 0;
-    color: #64748b;
-    font-size: 0.9rem;
+    color: #8b949e;
+    font-size: 0.88rem;
+    line-height: 1.5;
 }
 
 .empty-state {
     display: grid;
     gap: 0.25rem;
-    padding: 1rem;
+    padding: 1.25rem;
+    background: #0d1117;
+    border: 1px dashed #30363d;
 }
 
-.empty-state span {
-    color: #64748b;
-}
+    .empty-state span {
+        color: #8b949e;
+        font-size: 0.9rem;
+    }
 
 .summary-footer {
     display: flex;
@@ -143,15 +166,18 @@ h2 {
     justify-content: space-between;
     gap: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #30363d;
 }
 
-.summary-footer span {
-    color: #475569;
-    font-weight: 700;
-}
+    .summary-footer span {
+        color: #8b949e;
+        font-weight: 600;
+        font-size: 0.88rem;
+    }
 
-.summary-footer strong {
-    color: #111827;
-    font-size: 1.45rem;
-}
+    .summary-footer strong {
+        color: #00ff75;
+        font-size: 1.45rem;
+        font-weight: 700;
+        text-shadow: 0 0 20px rgba(0, 255, 117, 0.3);
+    }

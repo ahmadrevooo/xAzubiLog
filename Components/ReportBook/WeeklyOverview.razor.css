@@ -1,7 +1,22 @@
 .weekly-card {
     display: grid;
     gap: 1rem;
+    animation: fadeIn 0.35s ease;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* HEADER */
 
 .weekly-header {
     display: flex;
@@ -13,23 +28,27 @@
 .module-eyebrow {
     display: block;
     margin-bottom: 0.25rem;
-    color: #475569;
-    font-size: 0.75rem;
+    color: #00ff75;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0;
+    letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 h2 {
     margin: 0;
-    color: #111827;
+    color: #ffffff;
     font-size: 1.15rem;
 }
 
 .weekly-header strong {
-    color: #111827;
-    font-size: 1.35rem;
+    color: #00ff75;
+    font-size: 1.45rem;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(0,255,117,0.25);
 }
+
+/* GRID */
 
 .week-grid {
     display: grid;
@@ -37,46 +56,72 @@ h2 {
     gap: 0.75rem;
 }
 
+/* DAY CARDS */
+
 .week-day {
+    position: relative;
     display: grid;
     gap: 0.25rem;
-    min-width: 0;
-    padding: 0.85rem;
-    border: 1px solid #dbe3ea;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #111827;
+    padding: 0.9rem;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #0d1117, #161b22);
+    border: 1px solid #30363d;
+    color: #c9d1d9;
     text-align: left;
-    transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
-.week-day:hover,
-.week-day.active {
-    border-color: #2563eb;
-    background: #f8fbff;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
-}
+    /* Hover Effekt – Glow + Lift */
+    .week-day:hover {
+        transform: translateY(-3px) scale(1.01);
+        border-color: #484f58;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,255,117,0.15);
+    }
 
-.week-day span {
-    color: #475569;
-    font-size: 0.82rem;
-    font-weight: 800;
-    text-transform: uppercase;
-}
+    /* Active/Selected */
+    .week-day.active {
+        border-color: #00ff75;
+        background: linear-gradient(145deg, #0d2f1a, #0d1117);
+        box-shadow: 0 0 0 1px #00ff75, 0 6px 20px rgba(0,255,117,0.15);
+    }
 
-.week-day strong {
-    overflow-wrap: anywhere;
-    font-size: 1.05rem;
-}
+    /* Text */
 
-.week-day small {
-    color: #64748b;
-}
+    .week-day span {
+        color: #8b949e;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
 
-.week-day b {
-    color: #1d4ed8;
-    font-size: 1rem;
-}
+    .week-day strong {
+        font-size: 1.05rem;
+        color: #ffffff;
+    }
+
+    .week-day small {
+        color: #8b949e;
+        font-size: 0.8rem;
+    }
+
+    .week-day b {
+        color: #00ff75;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    /* Kleine Animation für Zahlen */
+    .week-day b {
+        transform: none;
+    }
+
+    .week-day:hover b {
+        transform: scale(1.03);
+    }
+
+/* RESPONSIVE */
 
 @media (max-width: 920px) {
     .week-grid {

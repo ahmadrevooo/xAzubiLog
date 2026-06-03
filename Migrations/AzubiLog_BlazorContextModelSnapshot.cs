@@ -15,7 +15,7 @@ namespace xAzubiLog.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
 
             modelBuilder.Entity("xAzubiLog.Models.Ausbilder", b =>
                 {
@@ -37,7 +37,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Ausbilder");
+                    b.ToTable("Ausbilder", (string)null);
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>
@@ -112,7 +112,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("WochenberichtId");
 
-                    b.ToTable("BerichtEintraege");
+                    b.ToTable("BerichtEintraege", (string)null);
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Kategorie", b =>
@@ -139,7 +139,28 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Kategorie");
+                    b.ToTable("Kategorie", (string)null);
+                });
+
+            modelBuilder.Entity("xAzubiLog.Models.PasswortResetToken", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Ablauf")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("PasswortResetTokens");
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.User", b =>
@@ -171,6 +192,10 @@ namespace xAzubiLog.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Rolle")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Schule")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -181,7 +206,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.Wochenbericht", b =>
@@ -217,7 +242,7 @@ namespace xAzubiLog.Migrations
 
                     b.HasIndex("BenutzerId");
 
-                    b.ToTable("Wochenbericht");
+                    b.ToTable("Wochenbericht", (string)null);
                 });
 
             modelBuilder.Entity("xAzubiLog.Models.BerichtEintraege", b =>

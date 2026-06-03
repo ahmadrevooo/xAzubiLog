@@ -20,13 +20,12 @@
             </p>
         </header>
 
-        <section class="report-book-module">
-            @if (!string.IsNullOrWhiteSpace(statusMessage))
-            {
-                <div class="status-alert" role="status">
-                    @statusMessage
-                </div>
-            }
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    { 
+        <div class="alert alert-light border status-alert" role="status">
+            @statusMessage
+        </div>
+    }
 
             <div class="report-layout">
 
@@ -147,10 +146,10 @@
 @code {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
 
-    private BerichtEintrag currentEntry = new() { Beschreibung = "" };
+    private BerichtEintraege currentEntry = new();
     private IReadOnlyList<Kategorie> categories = [];
-    private IReadOnlyList<BerichtEintrag> dailyEntries = [];
-    private IReadOnlyList<BerichtEintrag> weeklyEntries = [];
+    private IReadOnlyList<BerichtEintraege> dailyEntries = [];
+    private IReadOnlyList<BerichtEintraege> weeklyEntries = [];
     private DateTime selectedDate = DateTime.Today;
     private int? selectedEntryId;
     private string trainerName = "";
@@ -281,9 +280,12 @@
         if (message != null) statusMessage = message;
     }
 
-    private static BerichtEintrag CopyEntry(BerichtEintrag entry)
+    /// <summary>
+    /// Creates a detached copy so the overview list is not modified before saving.
+    /// </summary>
+    private static BerichtEintraege CopyEntry(BerichtEintraege entry)
     {
-        return new BerichtEintrag
+        return new BerichtEintraege
         {
             Id = entry.Id,
             BenutzerId = entry.BenutzerId,

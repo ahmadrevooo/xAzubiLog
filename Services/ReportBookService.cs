@@ -43,7 +43,7 @@ public sealed class ReportBookService
             .ThenBy(category => category.Name)
             .ToListAsync();
 
-        var dailyEntries = await context.BerichtEintrag
+        var dailyEntries = await context.BerichtEintraege
             .AsNoTracking()
             .Include(entry => entry.Kategorie)
             .Include(entry => entry.Ausbilder)
@@ -52,7 +52,7 @@ public sealed class ReportBookService
             .ThenBy(entry => entry.Titel)
             .ToListAsync();
 
-        var weeklyEntries = await context.BerichtEintrag
+        var weeklyEntries = await context.BerichtEintraege
             .AsNoTracking()
             .Include(entry => entry.Kategorie)
             .Where(entry => entry.BenutzerId == workContext.UserId && entry.Datum >= startOfWeek && entry.Datum < endOfWeek)
@@ -66,11 +66,11 @@ public sealed class ReportBookService
     /// <summary>
     /// Loads one existing report entry for editing.
     /// </summary>
-    public async Task<BerichtEintrag?> GetEntryAsync(int entryId)
+    public async Task<BerichtEintraege?> GetEntryAsync(int entryId)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
 
-        return await context.BerichtEintrag
+        return await context.BerichtEintraege
             .AsNoTracking()
             .Include(entry => entry.Ausbilder)
             .FirstOrDefaultAsync(entry => entry.Id == entryId);
@@ -79,7 +79,7 @@ public sealed class ReportBookService
     /// <summary>
     /// Inserts or updates a report entry and resolves optional category and trainer data.
     /// </summary>
-    public async Task<int> SaveEntryAsync(BerichtEintrag entry, string? trainerName, string? newCategoryName, string? newCategoryColor)
+    public async Task<int> SaveEntryAsync(BerichtEintraege entry, string? trainerName, string? newCategoryName, string? newCategoryColor)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
         var workContext = await EnsureWorkContextAsync(context, entry.Datum);
@@ -97,11 +97,11 @@ public sealed class ReportBookService
         {
             entry.ErstelltAm = DateTime.Now;
             entry.GeändertAm = DateTime.Now;
-            context.BerichtEintrag.Add(entry);
+            context.BerichtEintraege.Add(entry);
         }
         else
         {
-            var existing = await context.BerichtEintrag.FirstAsync(item => item.Id == entry.Id);
+            var existing = await context.BerichtEintraege.FirstAsync(item => item.Id == entry.Id);
             existing.AusbilderId = entry.AusbilderId;
             existing.KategorieId = entry.KategorieId;
             existing.WochenberichtId = entry.WochenberichtId;
@@ -129,25 +129,25 @@ public sealed class ReportBookService
     public async Task DeleteEntryAsync(int entryId)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
-        var entry = await context.BerichtEintrag.FirstOrDefaultAsync(item => item.Id == entryId);
+        var entry = await context.BerichtEintraege.FirstOrDefaultAsync(item => item.Id == entryId);
 
         if (entry is null)
         {
             return;
         }
 
-        context.BerichtEintrag.Remove(entry);
+        context.BerichtEintraege.Remove(entry);
         await context.SaveChangesAsync();
     }
 
     /// <summary>
     /// Creates a detached draft entry with useful defaults for the selected day.
     /// </summary>
-    public BerichtEintrag CreateDraftEntry(DateTime selectedDate)
+    public BerichtEintraege CreateDraftEntry(DateTime selectedDate)
     {
         var start = selectedDate.Date.AddHours(Math.Max(8, DateTime.Now.Hour));
 
-        return new BerichtEintrag
+        return new BerichtEintraege
         {
             Datum = selectedDate.Date,
             Startzeit = start,
@@ -336,5 +336,5 @@ public sealed class ReportBookService
 /// </summary>
 public sealed record ReportBookData(
     IReadOnlyList<Kategorie> Categories,
-    IReadOnlyList<BerichtEintrag> DailyEntries,
-    IReadOnlyList<BerichtEintrag> WeeklyEntries);
+    IReadOnlyList<BerichtEintraege> DailyEntries,
+    IReadOnlyList<BerichtEintraege> WeeklyEntries);

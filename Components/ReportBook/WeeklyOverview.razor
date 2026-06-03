@@ -34,7 +34,7 @@
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
 
     [Parameter] public DateTime SelectedDate { get; set; }
-    [Parameter] public IReadOnlyList<BerichtEintrag> Entries { get; set; } = [];
+    [Parameter] public IReadOnlyList<BerichtEintraege> Entries { get; set; } = [];
     [Parameter] public EventCallback<DateTime> OnDateSelected { get; set; }
 
     private DateTime WeekStart => ReportBookService.GetStartOfWeek(SelectedDate);
@@ -45,7 +45,7 @@
     /// <summary>
     /// Filters weekly entries for one displayed weekday.
     /// </summary>
-    private IReadOnlyList<BerichtEintrag> GetEntriesForDay(DateTime day)
+    private IReadOnlyList<BerichtEintraege> GetEntriesForDay(DateTime day)
     {
         return Entries.Where(entry => entry.Datum.Date == day.Date).ToList();
     }

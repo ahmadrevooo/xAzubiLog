@@ -78,3 +78,9 @@ input, textarea, select {
 .theme-light input, .theme-light textarea, .theme-light select {
     border-color: rgba(0,0,0,0.08);
 }
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    background-color: #0d1117;
+    color: #ffffff;
+}

@@ -111,7 +111,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private BerichtEintrag BerichtEintraege { get; set; } = default!;
+    private BerichtEintraege BerichtEintraege { get; set; } = default!;
 
     protected override void OnInitialized() => BerichtEintraege ??= new();
 
@@ -119,7 +119,7 @@
     private async Task AddBerichtEintraege()
     {
         using var context = DbFactory.CreateDbContext();
-        context.BerichtEintrag.Add(BerichtEintraege);
+        context.BerichtEintraege.Add(BerichtEintraege);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/BerichtEintraeges");
     }

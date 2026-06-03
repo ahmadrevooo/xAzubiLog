@@ -12,6 +12,6 @@
         public string Kommentar { get; set; } = "";
         public DateTime ErstelltAm { get; set; } = DateTime.Now;
 
-        public List<BerichtEintrag> BerichtEintraege { get; set; } = new();
+        public List<BerichtEintraege> BerichtEintraege { get; set; } = new();
     }
 }
