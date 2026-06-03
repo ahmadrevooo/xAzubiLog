@@ -4,52 +4,150 @@
 @using xAzubiLog.Models
 @using xAzubiLog.Services
 @inject ReportBookService ReportBookService
+@inject NavigationManager NavigationManager
 
-<PageTitle>Digitales Berichtsheft</PageTitle>
+<PageTitle>Digitales Berichtsheft - xAzubiLog</PageTitle>
 
-<section class="report-book-module">
-   
+<div class="saas-dark-enforcer min-vh-100">
+    <div class="container px-4 py-5" style="max-width: 1150px;">
 
-    @if (!string.IsNullOrWhiteSpace(statusMessage))
-    {
-        <div class="alert alert-light border status-alert" role="status">
-            @statusMessage
-        </div>
-    }
+        <header class="mb-5">
+            <h1 class="saas-title mb-2">
+                Deine Tagesberichte
+            </h1>
+            <p class="saas-subtitle">
+                Erfasse und verwalte deine Ausbildungsnachweise.
+            </p>
+        </header>
 
-    <div class="report-layout">
-        <section class="module-card form-card">
-            <DailyReportForm Entry="currentEntry"
-                             Categories="categories"
-                             @bind-TrainerName="trainerName"
-                             @bind-NewCategoryName="newCategoryName"
-                             @bind-NewCategoryColor="newCategoryColor"
-                             IsSaving="isSaving"
-                             OnSave="SaveEntryAsync"
-                             OnNewEntry="StartNewEntry"
-                             OnDeleteEntry="DeleteSelectedEntryAsync"
-                             OnDateChanged="ChangeSelectedDateAsync" />
+        <section class="report-book-module">
+            @if (!string.IsNullOrWhiteSpace(statusMessage))
+            {
+                <div class="status-alert" role="status">
+                    @statusMessage
+                </div>
+            }
+
+            <div class="report-layout">
+
+                <section class="module-card form-card shadow-lg">
+
+                    <EditForm Model="currentEntry" OnValidSubmit="SaveEntryAsync">
+                        <DataAnnotationsValidator />
+
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h4 class="text-white fw-normal m-0" style="letter-spacing: -0.5px;">Eintrag bearbeiten</h4>
+
+                            <div class="d-flex align-items-center" style="gap: 12px;">
+                                <span class="label-style m-0">Datum</span>
+                                <InputDate @bind-Value="currentEntry.Datum" @bind-Value:after="() => ChangeSelectedDateAsync(currentEntry.Datum)" max="@DateTime.Today.ToString("yyyy-MM-dd")" class="premium-date-input" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-5 pb-4 border-bottom-subtle">
+                            <button type="button" class="status-pill @(currentEntry.Tagestyp == "Betrieb" ? "active" : "")" @onclick='() => SetType("Betrieb")'>Im Betrieb</button>
+                            <button type="button" class="status-pill @(currentEntry.Tagestyp == "Schule" ? "active" : "")" @onclick='() => SetType("Schule")'>Berufsschule</button>
+                            <button type="button" class="status-pill @(currentEntry.Tagestyp == "Krank" ? "active" : "")" @onclick='() => SetType("Krank")'>Krank</button>
+                            <button type="button" class="status-pill @(currentEntry.Tagestyp == "Urlaub" ? "active" : "")" @onclick='() => SetType("Urlaub")'>Urlaub / Feiertag</button>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="label-style">Titel / Überschrift <span style="color: #ff4d4d;">*</span></label>
+                            <InputText @bind-Value="currentEntry.Titel" class="premium-input-title" placeholder="Kurze Zusammenfassung des Tages" maxlength="100" />
+                        </div>
+
+                        @if (currentEntry.Tagestyp == "Betrieb" || currentEntry.Tagestyp == "Schule")
+                        {
+                            var labelText = currentEntry.Tagestyp == "Betrieb" ? "Tätigkeitsbeschreibung" : "Unterrichtsinhalte";
+                            var placeholderText = currentEntry.Tagestyp == "Betrieb" ? "Was hast du heute im Betrieb gemacht?" : "Inhalte der Unterrichtsfächer...";
+
+                            <label class="label-style">@labelText <span style="color: #ff4d4d;">*</span></label>
+
+                            <textarea @bind="currentEntry.Beschreibung"
+                                      @bind:event="oninput"
+                                      class="premium-textarea" rows="10"
+                                      placeholder="@placeholderText" maxlength="1000"></textarea>
+
+                            <div class="d-flex justify-content-between mt-2 mb-4" style="font-size: 0.75rem;">
+                                @{
+                                    var currentLength = currentEntry.Beschreibung?.Length ?? 0;
+                                }
+                                <div style="color: @(currentLength < 50 ? "#ff4d4d" : "#8b949e")">
+                                    @(currentLength < 50 ? $"Noch {50 - currentLength} Zeichen bis zum Minimum" : "Mindestlänge erreicht")
+                                </div>
+                                <div style="color: @(currentLength > 950 ? "#ff4d4d" : "#8b949e")">
+                                    @currentLength / 1000 Zeichen
+                                </div>
+                            </div>
+
+                            @if (currentEntry.Tagestyp == "Betrieb")
+                            {
+                                <div class="mt-2 pt-4 border-top-subtle">
+                                    <label class="label-style">Notiz / Internes</label>
+                                    <InputText @bind-Value="currentEntry.Notiz" class="form-control premium-field" placeholder="Optionale, interne Bemerkung (taucht nicht im PDF auf)" />
+                                </div>
+                            }
+
+                            @if (currentEntry.Tagestyp == "Schule")
+                            {
+                                <div class="text-end mt-4">
+                                    <a href="settings?returnTo=tagesberichte" class="text-decoration-none hover-accent d-inline-flex align-items-center" style="color: #8b949e; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; transition: all 0.2s;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        Stundenplan anpassen
+                                    </a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <p style="color: #8b949e; margin: 0;">Für diesen Status ist keine Beschreibung erforderlich.</p>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top-subtle">
+                            @if (selectedEntryId != null)
+                            {
+                                <button type="button" class="btn text-danger hover-bg-danger" style="font-size: 0.85rem; padding: 8px 16px; border-radius: 6px; font-weight: 500;" @onclick="DeleteSelectedEntryAsync">Eintrag löschen</button>
+                            }
+                            else
+                            {
+                                <div></div>
+                            }
+
+                            @{
+                                bool requiresText = currentEntry.Tagestyp == "Betrieb" || currentEntry.Tagestyp == "Schule";
+                                int textLen = currentEntry.Beschreibung?.Length ?? 0;
+                                bool isDisabled = (requiresText && textLen < 50) || isSaving;
+                            }
+                            <button type="submit" class="btn-primary-custom text-uppercase" disabled="@isDisabled">
+                                @(isSaving ? "Speichert..." : "Eintrag speichern")
+                            </button>
+                        </div>
+                    </EditForm>
+                </section>
+
+                <aside class="module-card overview-card shadow-lg">
+                    <DailyOverview SelectedDate="selectedDate"
+                                   Entries="dailyEntries"
+                                   SelectedEntryId="selectedEntryId"
+                                   OnEntrySelected="SelectEntryAsync" />
+                </aside>
+            </div>
+
+            <section class="module-card week-section mt-4 shadow-lg">
+                <WeeklyOverview SelectedDate="selectedDate"
+                                Entries="weeklyEntries"
+                                OnDateSelected="ChangeSelectedDateAsync" />
+            </section>
         </section>
-
-        <aside class="module-card overview-card">
-            <DailyOverview SelectedDate="selectedDate"
-                           Entries="dailyEntries"
-                           SelectedEntryId="selectedEntryId"
-                           OnEntrySelected="SelectEntryAsync" />
-        </aside>
     </div>
-
-    <section class="module-card week-section">
-        <WeeklyOverview SelectedDate="selectedDate"
-                        Entries="weeklyEntries"
-                        OnDateSelected="ChangeSelectedDateAsync" />
-    </section>
-</section>
+</div>
 
 @code {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
 
-    private BerichtEintrag currentEntry = new();
+    private BerichtEintrag currentEntry = new() { Beschreibung = "" };
     private IReadOnlyList<Kategorie> categories = [];
     private IReadOnlyList<BerichtEintrag> dailyEntries = [];
     private IReadOnlyList<BerichtEintrag> weeklyEntries = [];
@@ -67,17 +165,30 @@
         await RefreshAsync("");
     }
 
-    /// <summary>
-    /// Persists the current entry and refreshes all overviews.
-    /// </summary>
+    private void StartNewEntry()
+    {
+        currentEntry = ReportBookService.CreateDraftEntry(selectedDate);
+        currentEntry.Tagestyp = "Betrieb";
+        currentEntry.Beschreibung = "";
+
+        // Pauschaler 8-Stunden-Tag für das Backend der Kollegen
+        currentEntry.Startzeit = selectedDate.Date.AddHours(8);
+        currentEntry.Endzeit = selectedDate.Date.AddHours(16).AddMinutes(30);
+        currentEntry.Dauer = 8;
+
+        selectedEntryId = null;
+        trainerName = "";
+        newCategoryName = "";
+        statusMessage = null;
+    }
+
     private async Task SaveEntryAsync()
     {
         isSaving = true;
-
         try
         {
             await ReportBookService.SaveEntryAsync(currentEntry, trainerName, newCategoryName, newCategoryColor);
-            await RefreshAsync("Eintrag wurde gespeichert.");
+            await RefreshAsync("Eintrag wurde erfolgreich gespeichert.");
             StartNewEntry();
         }
         finally
@@ -86,9 +197,6 @@
         }
     }
 
-    /// <summary>
-    /// Selects an existing entry and loads it into the form.
-    /// </summary>
     private async Task SelectEntryAsync(int entryId)
     {
         var entry = await ReportBookService.GetEntryAsync(entryId);
@@ -103,23 +211,14 @@
         selectedEntryId = entry.Id;
         selectedDate = entry.Datum.Date;
         trainerName = entry.Ausbilder?.Name ?? "";
-        newCategoryName = "";
-        newCategoryColor = "#334155";
         statusMessage = "Eintrag zur Bearbeitung geladen.";
     }
 
-    /// <summary>
-    /// Deletes the selected entry after a user action.
-    /// </summary>
     private async Task DeleteSelectedEntryAsync()
     {
-        if (selectedEntryId is null)
-        {
-            return;
-        }
+        if (selectedEntryId is null) return;
 
         isSaving = true;
-
         try
         {
             await ReportBookService.DeleteEntryAsync(selectedEntryId.Value);
@@ -132,45 +231,56 @@
         }
     }
 
-    /// <summary>
-    /// Starts a clean draft for the selected day.
-    /// </summary>
-    private void StartNewEntry()
-    {
-        currentEntry = ReportBookService.CreateDraftEntry(selectedDate);
-        selectedEntryId = null;
-        trainerName = "";
-        newCategoryName = "";
-        newCategoryColor = "#334155";
-    }
-
-    /// <summary>
-    /// Changes the working day and updates daily and weekly data.
-    /// </summary>
     private async Task ChangeSelectedDateAsync(DateTime date)
     {
         selectedDate = date.Date;
         currentEntry.Datum = selectedDate;
+
         currentEntry.Startzeit = selectedDate.Add(currentEntry.Startzeit.TimeOfDay);
         currentEntry.Endzeit = selectedDate.Add(currentEntry.Endzeit.TimeOfDay);
+
+        if (currentEntry.Tagestyp == "Schule") await LadeStundenplanVorlagen();
+
         await RefreshAsync();
     }
 
-    /// <summary>
-    /// Reloads categories and report entries from the database.
-    /// </summary>
+    private async Task SetType(string type)
+    {
+        currentEntry.Tagestyp = type;
+
+        if (type == "Schule") await LadeStundenplanVorlagen();
+        else if (type == "Krank" || type == "Urlaub")
+        {
+            currentEntry.Titel = type;
+            currentEntry.Beschreibung = "-";
+        }
+        else
+        {
+            currentEntry.Titel = "";
+            currentEntry.Beschreibung = "";
+        }
+        StateHasChanged();
+    }
+
+    private async Task LadeStundenplanVorlagen()
+    {
+        if (string.IsNullOrWhiteSpace(currentEntry.Beschreibung) || currentEntry.Beschreibung == "-")
+        {
+            currentEntry.Beschreibung = "IT-Systeme:\n- \n\nVernetzte Systeme:\n- ";
+            currentEntry.Titel = $"Berufsschule ({currentEntry.Datum.ToString("dd.MM.yyyy")})";
+        }
+        await Task.CompletedTask;
+    }
+
     private async Task RefreshAsync(string? message = null)
     {
         var data = await ReportBookService.LoadAsync(selectedDate);
         categories = data.Categories;
         dailyEntries = data.DailyEntries;
         weeklyEntries = data.WeeklyEntries;
-        statusMessage = message ?? $"Aktualisiert um {DateTime.Now:HH:mm} Uhr.";
+        if (message != null) statusMessage = message;
     }
 
-    /// <summary>
-    /// Creates a detached copy so the overview list is not modified before saving.
-    /// </summary>
     private static BerichtEintrag CopyEntry(BerichtEintrag entry)
     {
         return new BerichtEintrag
@@ -198,3 +308,294 @@
         };
     }
 }
+
+<style>
+    /* =========================================================================
+           xAzubiLog - MODERN SaaS DARK THEME (Hellblau Edition)
+           ========================================================================= */
+
+    :root {
+        --saas-bg: #0d1117;
+        --saas-card: #161b22;
+        --saas-border: rgba(255, 255, 255, 0.08);
+        --saas-accent: #0ea5e9; /* DEIN CYAN / HELLBLAU VOM LOGIN-SCREEN */
+        --saas-accent-hover: #0284c7;
+        --saas-text: #ffffff;
+        --saas-muted: #8b949e;
+    }
+
+    /* Der Wrapper schützt die gesamte Seite vor dem Bootstrap-Light-Mode */
+    .saas-dark-enforcer {
+        background-color: var(--saas-bg) !important;
+        color: var(--saas-text) !important;
+        min-height: 100vh;
+        width: 100%;
+        margin: -1.5rem;
+        padding: 1.5rem;
+    }
+
+        .saas-dark-enforcer .saas-title {
+            color: var(--saas-text) !important;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            letter-spacing: -1px;
+            font-weight: 500;
+        }
+
+        .saas-dark-enforcer .saas-subtitle {
+            color: var(--saas-muted) !important;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .saas-dark-enforcer .report-book-module {
+            display: grid;
+            gap: 1.5rem;
+            padding: 1rem 0 2rem;
+        }
+
+        /* Hellblaue Status-Meldungen */
+        .saas-dark-enforcer .status-alert {
+            margin: 0;
+            background-color: rgba(14, 165, 233, 0.1) !important;
+            color: var(--saas-accent) !important;
+            border: 1px solid rgba(14, 165, 233, 0.3) !important;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .saas-dark-enforcer .report-layout {
+            display: grid;
+            grid-template-columns: minmax(420px, 1.2fr) minmax(320px, 0.8fr);
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .saas-dark-enforcer .module-card {
+            padding: 2rem;
+            border: 1px solid var(--saas-border);
+            border-radius: 12px;
+            background: var(--saas-card);
+        }
+
+        .saas-dark-enforcer .border-bottom-subtle {
+            border-bottom: 1px solid var(--saas-border) !important;
+        }
+
+        .saas-dark-enforcer .border-top-subtle {
+            border-top: 1px solid var(--saas-border) !important;
+        }
+
+        .saas-dark-enforcer .overview-card {
+            min-height: 32rem;
+        }
+
+        .saas-dark-enforcer .week-section {
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .saas-dark-enforcer .label-style {
+            color: var(--saas-muted);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .saas-dark-enforcer .premium-date-input {
+            background: rgba(1, 4, 9, 0.5);
+            border: 1px solid var(--saas-border);
+            color: var(--saas-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color-scheme: dark;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+            .saas-dark-enforcer .premium-date-input:focus {
+                border-color: var(--saas-accent);
+            }
+
+        /* Aktive Pills leuchten Hellblau */
+        .saas-dark-enforcer .status-pill {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--saas-muted);
+            border: 1px solid var(--saas-border);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .saas-dark-enforcer .status-pill:hover {
+                border-color: rgba(255,255,255,0.3);
+                color: var(--saas-text);
+            }
+
+            .saas-dark-enforcer .status-pill.active {
+                background-color: rgba(14, 165, 233, 0.1) !important;
+                color: var(--saas-accent) !important;
+                border-color: var(--saas-accent) !important;
+                box-shadow: 0 0 12px rgba(14, 165, 233, 0.2);
+            }
+
+        .saas-dark-enforcer .premium-input-title,
+        .saas-dark-enforcer .premium-textarea,
+        .saas-dark-enforcer .premium-field {
+            width: 100%;
+            background: rgba(1, 4, 9, 0.3) !important;
+            border: 1px solid var(--saas-border) !important;
+            color: var(--saas-text) !important;
+            border-radius: 8px;
+            padding: 12px 16px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .saas-dark-enforcer .premium-input-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .saas-dark-enforcer .premium-textarea {
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+            .saas-dark-enforcer .premium-input-title:focus,
+            .saas-dark-enforcer .premium-textarea:focus,
+            .saas-dark-enforcer .premium-field:focus {
+                border-color: var(--saas-accent) !important;
+                box-shadow: 0 0 0 1px var(--saas-accent) !important;
+            }
+
+        /* Dein HELLBLAUER Speichern-Button mit WEISSER Schrift */
+        .saas-dark-enforcer .btn-primary-custom {
+            background-color: var(--saas-accent) !important;
+            color: #ffffff !important;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+            .saas-dark-enforcer .btn-primary-custom:hover {
+                background-color: var(--saas-accent-hover) !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            }
+
+            .saas-dark-enforcer .btn-primary-custom:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        .saas-dark-enforcer .hover-accent:hover {
+            color: var(--saas-accent) !important;
+            border-color: var(--saas-accent) !important;
+        }
+
+        .saas-dark-enforcer .hover-bg-danger:hover {
+            background-color: rgba(255, 77, 77, 0.1) !important;
+        }
+
+
+    /* =========================================================================
+           DIE NUKLEAR-OPTION: ZERSTÖRT JEDEN WEISSEN HINTERGRUND IN DEN KIND-KOMPONENTEN
+           ========================================================================= */
+
+    /* 1. Wir hacken die Bootstrap Kern-Variablen von innen heraus auf dieser Seite */
+    .saas-dark-enforcer {
+        --bs-white: rgba(1, 4, 9, 0.4) !important;
+        --bs-white-rgb: 1, 4, 9 !important;
+        --bs-light: rgba(1, 4, 9, 0.4) !important;
+        --bs-light-rgb: 1, 4, 9 !important;
+        --bs-body-bg: #0d1117 !important;
+        --bs-card-bg: rgba(1, 4, 9, 0.4) !important;
+    }
+
+        /* 2. Wir rasieren JEDEN Hintergrund innerhalb der Kollegen-Karten restlos ab */
+        .saas-dark-enforcer .overview-card div,
+        .saas-dark-enforcer .week-section div,
+        .saas-dark-enforcer .overview-card ul,
+        .saas-dark-enforcer .overview-card li {
+            background-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+            /* 3. Wir bauen das edle Dark-Kästchen auf gepaddeten Elementen wieder auf */
+            .saas-dark-enforcer .overview-card div[class*="p-"],
+            .saas-dark-enforcer .week-section div[class*="p-"],
+            .saas-dark-enforcer .overview-card div[style*="padding"],
+            .saas-dark-enforcer .week-section div[style*="padding"] {
+                background-color: rgba(1, 4, 9, 0.4) !important;
+                background: rgba(1, 4, 9, 0.4) !important;
+                border: 1px dashed rgba(255, 255, 255, 0.15) !important;
+                border-radius: 8px !important;
+            }
+
+                /* Verhindert doppelte gestrichelte Linien bei Verschachtelung */
+                .saas-dark-enforcer .overview-card div[class*="p-"] div[class*="p-"],
+                .saas-dark-enforcer .week-section div[class*="p-"] div[class*="p-"] {
+                    border: none !important;
+                    background-color: transparent !important;
+                }
+
+        /* 4. Textfarben-Korrektur tief in die Child-Komponenten hinein (Löst das "Weiß-auf-Weiß"-Problem) */
+        .saas-dark-enforcer .overview-card *,
+        .saas-dark-enforcer .week-section * {
+            color: var(--saas-text) !important;
+        }
+
+        /* Klares Slate-Grau für Sekundärtexte für exzellenten Kontrast */
+        .saas-dark-enforcer .overview-card p,
+        .saas-dark-enforcer .overview-card .text-muted,
+        .saas-dark-enforcer .week-section p,
+        .saas-dark-enforcer .week-section .text-muted,
+        .saas-dark-enforcer .overview-card small,
+        .saas-dark-enforcer .week-section small {
+            color: #94a3b8 !important;
+        }
+
+        /* Das "Standard-Blau" deiner Kollegen in DEIN Hellblau umwandeln */
+        .saas-dark-enforcer .overview-card .text-primary,
+        .saas-dark-enforcer .week-section .text-primary {
+            color: var(--saas-accent) !important;
+        }
+
+        /* KORREKTUR: Zähler Badges anpassen (Kleine 0 oben rechts leuchtet jetzt kontraststark in Cyan) */
+        .saas-dark-enforcer .overview-card .badge,
+        .saas-dark-enforcer .overview-card .rounded-circle,
+        .saas-dark-enforcer .week-section .badge {
+            background-color: rgba(14, 165, 233, 0.15) !important;
+            color: #38bdf8 !important; /* Stark lesbares Hellblau */
+            border: 1px solid rgba(14, 165, 233, 0.4) !important;
+            font-weight: 600 !important;
+            padding: 0.35em 0.65em !important;
+        }
+
+    /* Doppel-At für korrekte Razor-Kompilierung im Inline-Style */
+    @@media (max-width: 1180px) {
+        .saas-dark-enforcer .report-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .saas-dark-enforcer .overview-card {
+            min-height: auto;
+        }
+    }
+</style>
