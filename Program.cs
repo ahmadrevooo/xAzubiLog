@@ -7,6 +7,7 @@ using xAzubiLog.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
