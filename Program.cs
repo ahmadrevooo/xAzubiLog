@@ -18,7 +18,7 @@ builder.Services.AddDataProtection()
 // Datenbank
 builder.Services.AddDbContextFactory<xAzubiLog.Data.xAzubiLogContext>(options =>
     options.UseSqlite("Data Source=xAzubiLog.db"));
-builder.Services.AddSingleton<xAzubiLog.Services.AuthService>();
+builder.Services.AddScoped<xAzubiLog.Services.AuthService>();
 
 builder.Services.AddScoped<xAzubiLog.Services.ReportBookService>();
 
