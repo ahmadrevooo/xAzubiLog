@@ -7,7 +7,7 @@
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Auth.CurrentUser == null)
+        if (firstRender && !Auth.IsAuthenticated)
         {
             try
             {
@@ -16,13 +16,10 @@
                 if (result.Success && result.Value != 0)
                 {
                     await Auth.RestoreSessionAsync(result.Value);
-                    StateHasChanged(); // wichtig für UI update
+                    StateHasChanged();
                 }
             }
-            catch
-            {
-                // optional logging
-            }
+            catch { }
         }
     }
 }

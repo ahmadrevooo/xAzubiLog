@@ -3,6 +3,8 @@
 @inject xAzubiLog.Services.ThemeService Theme
 @inject IJSRuntime JS
 
+<SessionHandler />   <!-- 🔥 DAS FEHLT BEI DIR -->
+
 <div class="app-layout">
     <NavMenu />
     <main class="content">
@@ -16,17 +18,22 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+
         string? stored = null;
         try
         {
             stored = await JS.InvokeAsync<string?>("localStorage.getItem", "theme");
         }
         catch { }
+
         var isDark = string.Equals(stored, "dark", StringComparison.OrdinalIgnoreCase);
         await Theme.InitializeAsync(isDark);
+
         await JS.InvokeVoidAsync("setTheme", Theme.IsDark);
+
         themeHandler = () => { _ = JS.InvokeVoidAsync("setTheme", Theme.IsDark); };
         Theme.OnChange += themeHandler;
+
         StateHasChanged();
     }
 
