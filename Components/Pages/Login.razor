@@ -194,7 +194,7 @@
         if (user != null)
         {
             await SessionStorage.SetAsync("userId", user.ID);
-            Nav.NavigateTo("/", forceLoad: true);
+            Nav.NavigateTo("/", forceLoad: false);
         }
         else
             fehler = "E-Mail oder Passwort falsch.";

@@ -3,12 +3,17 @@
 @inject xAzubiLog.Services.AuthService Auth
 @inject xAzubiLog.Data.xAzubiLogContext DB
 @inject NavigationManager Nav
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
 @using Microsoft.EntityFrameworkCore
 @using xAzubiLog.Models
 
 <PageTitle>Dashboard – xAzubiLog</PageTitle>
 
-@if (Auth.CurrentUser == null)
+@if (!sessionGeladen)
+{
+    <div style="height:100vh; background:#0d1117;"></div>
+}
+else if (Auth.CurrentUser == null)
 {
     <div class="d-flex justify-content-center align-items-center" style="height:100vh; background:#0d1117;">
         <div class="text-center text-white">
@@ -116,220 +121,88 @@ else
 }
 
 <style>
-    .dashboard {
-        display: flex;
-        height: 100vh;
-        background: #0d1117;
-        color: white;
-        font-family: sans-serif;
-        overflow: hidden;
-    }
-
-    .sidebar {
-        width: 220px;
-        background: #161b22;
-        padding: 1.5rem 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        border-right: 1px solid #30363d;
-    }
-
-    .sidebar-logo {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .logo-box {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #00ff75, #3700ff);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-
+    .dashboard { display: flex; height: 100vh; background: #0d1117; color: white; font-family: sans-serif; overflow: hidden; }
+    .sidebar { width: 220px; background: #161b22; padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 1.5rem; border-right: 1px solid #30363d; }
+    .sidebar-logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-box { width: 40px; height: 40px; background: linear-gradient(135deg, #00ff75, #3700ff); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
     .logo-title { font-weight: 700; font-size: 1rem; }
     .logo-sub { font-size: 0.7rem; color: #8b949e; }
-
-    .sidebar-stats {
-        padding-top: 1rem;
-        border-top: 1px solid #30363d;
-    }
-
+    .sidebar-stats { padding-top: 1rem; border-top: 1px solid #30363d; }
     .stat-label { font-size: 0.8rem; color: #8b949e; }
     .stat-value { font-size: 2rem; font-weight: 700; color: #00ff75; }
     .stat-milestone { font-size: 0.85rem; color: white; margin-top: 0.25rem; }
-
-    .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        padding: 1.5rem;
-        gap: 1.5rem;
-    }
-
-    .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #161b22;
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-    }
-
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 1.5rem; gap: 1.5rem; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; background: #161b22; border-radius: 12px; padding: 0.75rem 1.5rem; }
     .nav-links { display: flex; gap: 1.5rem; }
-
-    .nav-link {
-        color: #8b949e;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-
-    .nav-link.active {
-        color: #00ff75;
-        border-bottom: 2px solid #00ff75;
-        padding-bottom: 2px;
-    }
-
-    .user-badge {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        background: #21262d;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-    }
-
-    .user-dot {
-        width: 8px;
-        height: 8px;
-        background: #00ff75;
-        border-radius: 50%;
-    }
-
-    .welcome-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #161b22;
-        border-radius: 12px;
-        padding: 1.5rem;
-    }
-
+    .nav-link { color: #8b949e; text-decoration: none; font-size: 0.9rem; }
+    .nav-link.active { color: #00ff75; border-bottom: 2px solid #00ff75; padding-bottom: 2px; }
+    .user-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; background: #21262d; padding: 0.4rem 1rem; border-radius: 20px; }
+    .user-dot { width: 8px; height: 8px; background: #00ff75; border-radius: 50%; }
+    .welcome-section { display: flex; justify-content: space-between; align-items: center; background: #161b22; border-radius: 12px; padding: 1.5rem; }
     .welcome-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     .welcome-sub { color: #8b949e; margin: 0.25rem 0 0; font-size: 0.9rem; }
     .snapshot-box { text-align: right; }
     .snapshot-label { font-size: 0.8rem; color: #8b949e; }
     .snapshot-value { font-size: 2rem; font-weight: 700; }
-
-    .snapshot-bar {
-        width: 100px;
-        height: 4px;
-        background: #30363d;
-        border-radius: 2px;
-        margin-top: 0.5rem;
-    }
-
-    .snapshot-fill {
-        width: 60%;
-        height: 100%;
-        background: #00ff75;
-        border-radius: 2px;
-    }
-
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-    }
-
-    .card-item {
-        border-radius: 12px;
-        padding: 1.25rem;
-        position: relative;
-        min-height: 120px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
+    .snapshot-bar { width: 100px; height: 4px; background: #30363d; border-radius: 2px; margin-top: 0.5rem; }
+    .snapshot-fill { width: 60%; height: 100%; background: #00ff75; border-radius: 2px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .card-item { border-radius: 12px; padding: 1.25rem; position: relative; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between; }
     .card-item.teal { background: linear-gradient(135deg, #0d4f3c, #1a7a5e); }
     .card-item.blue { background: linear-gradient(135deg, #0d2f4f, #1a4a7a); }
     .card-item.purple { background: linear-gradient(135deg, #2d0d4f, #4a1a7a); }
-
     .card-title { font-weight: 600; font-size: 1rem; }
-
-    .card-btn {
-        background: rgba(255,255,255,0.15);
-        border: none;
-        color: white;
-        padding: 0.4rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        width: fit-content;
-        transition: background 0.2s;
-    }
-
+    .card-btn { background: rgba(255,255,255,0.15); border: none; color: white; padding: 0.4rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; width: fit-content; transition: background 0.2s; }
     .card-btn:hover { background: rgba(255,255,255,0.25); }
-
-    .card-icon {
-        position: absolute;
-        bottom: 1rem;
-        right: 1rem;
-        font-size: 2rem;
-        opacity: 0.4;
-    }
-
-    .bottom-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .bottom-card {
-        background: #161b22;
-        border-radius: 12px;
-        padding: 1.25rem;
-    }
-
-    .bottom-title {
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-        color: #8b949e;
-        font-size: 0.9rem;
-    }
-
-    .bottom-item {
-        font-size: 0.85rem;
-        color: #c9d1d9;
-        padding: 0.3rem 0;
-        border-bottom: 1px solid #21262d;
-    }
+    .card-icon { position: absolute; bottom: 1rem; right: 1rem; font-size: 2rem; opacity: 0.4; }
+    .bottom-section { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .bottom-card { background: #161b22; border-radius: 12px; padding: 1.25rem; }
+    .bottom-title { font-weight: 600; margin-bottom: 0.75rem; color: #8b949e; font-size: 0.9rem; }
+    .bottom-item { font-size: 0.85rem; color: #c9d1d9; padding: 0.3rem 0; border-bottom: 1px solid #21262d; }
 </style>
 
 @code {
     int anzahlBerichte = 0;
     List<BerichtEintraege> letzteEintraege = new();
     List<Wochenbericht> unvollstaendig = new();
+    bool sessionGeladen = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Auth.CurrentUser == null)
+            {
+                try
+                {
+                    var result = await SessionStorage.GetAsync<int>("userId");
+                    if (result.Success)
+                    {
+                        await Auth.RestoreSessionAsync(result.Value);
+                        await LadeData();
+                    }
+                }
+                catch { }
+            }
+            else
+            {
+                await LadeData();
+            }
+
+            sessionGeladen = true;
+            StateHasChanged();
+        }
+    }
+
+    async Task LadeData()
     {
         if (Auth.CurrentUser == null) return;
-
         var userId = Auth.CurrentUser.ID;
 
-        anzahlBerichte = await DB.BerichtEintrag
+        anzahlBerichte = await DB.BerichtEintraege
             .CountAsync(b => b.BenutzerId == userId);
 
-        letzteEintraege = await DB.BerichtEintrag
+        letzteEintraege = await DB.BerichtEintraege
             .Where(b => b.BenutzerId == userId)
             .OrderByDescending(b => b.Datum)
             .Take(4)
