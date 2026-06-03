@@ -8,7 +8,7 @@
 <button @onclick="Logout">Logout</button>
 
 @code {
-    private async Task Logout()
+    private async Task DoLogout()
     {
         // 1. Session löschen
         await SessionStorage.DeleteAsync("userId");
