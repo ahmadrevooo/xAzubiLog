@@ -1,7 +1,10 @@
-﻿@inject xAzubiLog.Services.AuthService Auth
+﻿@using xAzubiLog.Services
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedSessionStorage SessionStorage
+@inject AuthService AuthService
 @inject NavigationManager Nav
-@rendermode InteractiveServer
-@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
+
 
 <nav class="py-4 px-4 px-md-5" style="background-color: transparent;">
     <div class="d-flex justify-content-between align-items-center w-100">
@@ -236,13 +239,29 @@
             try
             {
                 var result = await SessionStorage.GetAsync<int>("userId");
-                if (result.Success)
+
+                if (result.Success && result.Value != 0)
                 {
                     await Auth.RestoreSessionAsync(result.Value);
                     StateHasChanged();
                 }
             }
-            catch { }
+            catch
+            {
+                // optional logging
+            }
         }
+    }
+
+    private async Task DoLogout()
+    {
+        // 1. Session löschen
+        await SessionStorage.DeleteAsync("userId");
+
+        // 2. Auth zurücksetzen
+        Auth.Logout();
+
+        // 3. Redirect auf Login
+        Nav.NavigateTo("/login", true);
     }
 }
