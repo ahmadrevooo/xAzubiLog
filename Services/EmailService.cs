@@ -15,8 +15,11 @@ namespace xAzubiLog.Services
 
         public async Task SendePasswortResetMail(string empfaenger, string resetLink)
         {
+            Console.WriteLine($"SMTP HOST: {_config["Smtp__Host"]}");
+            Console.WriteLine($"SMTP USER: {_config["Smtp__User"]}");
+
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("xAzubiLog", _config["Smtp:User"]));
+            message.From.Add(new MailboxAddress("xAzubiLog", _config["Smtp__User"]));
             message.To.Add(MailboxAddress.Parse(empfaenger));
             message.Subject = "Passwort zurücksetzen";
 
