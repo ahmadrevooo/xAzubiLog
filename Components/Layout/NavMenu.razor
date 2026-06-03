@@ -264,4 +264,14 @@
         // 3. Redirect auf Login
         Nav.NavigateTo("/login", true);
     }
+
+    protected override void OnInitialized()
+{
+    Auth.OnChange += StateHasChanged;
+}
+
+public void Dispose()
+{
+    Auth.OnChange -= StateHasChanged;
+}
 }
