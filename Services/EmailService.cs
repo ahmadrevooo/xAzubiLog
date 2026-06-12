@@ -15,11 +15,11 @@ namespace xAzubiLog.Services
 
         public async Task SendePasswortResetMail(string empfaenger, string resetLink)
         {
-            Console.WriteLine($"SMTP HOST: {_config["Smtp__Host"]}");
-            Console.WriteLine($"SMTP USER: {_config["Smtp__User"]}");
+            Console.WriteLine($"SMTP HOST: {_config["Smtp:Host"]}");
+            Console.WriteLine($"SMTP USER: {_config["Smtp:User"]}");
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("xAzubiLog", _config["Smtp__User"]));
+            message.From.Add(new MailboxAddress("xAzubiLog", _config["Smtp:User"]));
             message.To.Add(MailboxAddress.Parse(empfaenger));
             message.Subject = "Passwort zurücksetzen";
 
@@ -46,12 +46,12 @@ namespace xAzubiLog.Services
 
             using var client = new SmtpClient();
             await client.ConnectAsync(
-                _config["Smtp__Host"],
-                int.Parse(_config["Smtp__Port"]!),
+                _config["Smtp:Host"],
+                int.Parse(_config["Smtp:Port"]!),
                 SecureSocketOptions.StartTls);
             await client.AuthenticateAsync(
-                _config["Smtp__User"],
-                _config["Smtp__Pass"]);
+                _config["Smtp:User"],
+                _config["Smtp:Pass"]);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
         }
